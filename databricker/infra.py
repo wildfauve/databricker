@@ -10,7 +10,7 @@ import subprocess
 import tomli
 import configparser
 
-from databricker.lib import monad, fn, singleton
+from .lib import monad, fn, singleton
 
 
 class InfraConfig(singleton.Singleton):
