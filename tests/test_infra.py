@@ -4,7 +4,7 @@ from databricker import infra
 
 def setup_module():
     infra.InfraConfig().configure(infra_config_file="tests/fixtures/infra.toml",
-                                  dist="tests/fixtures/dist")
+                                  dist="dist")
 
 def test_infra_config():
     result = infra.config_value()
@@ -19,7 +19,7 @@ def test_infra_config():
 def test_generates_dbfs_location_for_wheel(config_value):
     dbfs_loc = infra.dbfs_artefact(config_value)
 
-    assert "dbfs:/artifacts/job/job/dist/fake-dist-0.1.0-py3-none-any.whl" in dbfs_loc
+    assert "dbfs:/artifacts/job/job/dist/databricker-0.1.1-py3-none-any.whl" in dbfs_loc
 
 
 def test_builds_job_update_request_with_schedule():

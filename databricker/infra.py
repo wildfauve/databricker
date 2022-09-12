@@ -10,7 +10,7 @@ import subprocess
 import tomli
 import configparser
 
-from .lib import monad, fn, singleton
+from .util import monad, fn, singleton
 
 
 class InfraConfig(singleton.Singleton):
