@@ -9,7 +9,7 @@ infra = "_infra.cli:infra_cli"
  
 """
 
-infra.InfraConfig().configure(infra_config_file="tests/fixtures/infra.toml", dist="tests/fixtures/dist")
+infra.configurator()(infra_config_file="tests/fixtures/infra.toml", dist="tests/fixtures/dist")
 
 def infra_cli():
     infra.init_cli()
