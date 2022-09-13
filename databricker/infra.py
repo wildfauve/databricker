@@ -1,8 +1,8 @@
 import click
 
 
-from .command import list_job, create_job, build_deploy
-from .util import config
+from databricker.command import list_job_command, create_job_command, build_deploy_command
+from databricker.util import config
 
 
 @click.group()
@@ -15,7 +15,7 @@ def list_job():
     """
     Lists the job with the job id defined in the infra.toml file.
     """
-    list_job.run()
+    list_job_command.run()
     pass
 
 @click.command()
@@ -23,7 +23,7 @@ def create_job():
     """
     Creates a Spark job from the configuration provided in the infra.toml
     """
-    create_job.run()
+    create_job_command.run()
     pass
 
 
@@ -42,7 +42,7 @@ def build_deploy(bump):
     + Copies the wheel to the cluster at the location defined in the infra.toml file at artefacts.root
     + Updates the job with the new artefact.
     """
-    build_deploy.run(bump)
+    build_deploy_command.run(bump)
     pass
 
 def configurator():
@@ -50,6 +50,7 @@ def configurator():
 
 cli.add_command(list_job)
 cli.add_command(build_deploy)
+cli.add_command(create_job)
 
 def init_cli():
     cli()

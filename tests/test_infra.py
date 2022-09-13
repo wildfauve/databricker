@@ -1,6 +1,6 @@
 import pytest
 
-from databricker.command import list_job, build_deploy, create_job
+from databricker.command import list_job_command, build_deploy_command, create_job_command
 from databricker.util import config, job
 
 
@@ -22,7 +22,7 @@ def test_infra_config():
 def test_generates_dbfs_location_for_wheel(config_value):
     dbfs_loc = config.dbfs_artefact(config_value)
 
-    assert "dbfs:/artifacts/job/job/dist/databricker-0.1.3-py3-none-any.whl" in dbfs_loc
+    assert "dbfs:/artifacts/job/job/dist/databricker-0.1.6-py3-none-any.whl" in dbfs_loc
 
 
 def test_builds_job_update_request_with_schedule():
@@ -53,14 +53,14 @@ def test_list_job(config_value, requests_mock):
                       status_code=200,
                       headers={'Content-Type': 'application/json; charset=utf-8'})
 
-    result = list_job.run()
+    result = list_job_command.run()
 
     assert result['job_id'] == 314471534377936
 
 
-def test_build_deploy(config_value):
-    result = build_deploy.run("patch")
-    breakpoint()
+# def test_build_deploy(config_value):
+#     result = build_deploy_command.run("patch")
+#     breakpoint()
 
 @pytest.fixture
 def config_value():
