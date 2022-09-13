@@ -1,7 +1,7 @@
 import click
 
 
-from command import list_job, create_job, build_deploy
+from .command import list_job, create_job, build_deploy
 from .util import config
 
 
