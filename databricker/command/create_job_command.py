@@ -26,7 +26,7 @@ def idempotent_check(cfg):
     job_id = job.job_id(cfg)
     if job_id:
         cli_helpers.echo("Job found in toml file with ID: {}".format(job_id))
-        return monad.Left("Job is already created with ID: {}.  To fix delete the job first".format(job_id))
+        return monad.Left("Job is already created with ID: {}. To fix delete the job first.".format(job_id))
     return monad.Right(cfg)
 
 

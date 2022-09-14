@@ -63,7 +63,7 @@ def copy_to_dbfs(cfg):
 
 def update_job(cfg):
     cli_helpers.echo(
-        "Update Job Artefact: {}, {}, {}".format(job.job_id(cfg), job.task(config), config.dbfs_artefact(cfg)))
+        "Update Job Artefact: {}, {}, {}".format(job.job_id(cfg), job.task(cfg), config.dbfs_artefact(cfg)))
     result = job.update_job_caller(cfg, job.update_job_request(job_id=job.job_id(cfg),
                                                                task_key=job.task(cfg),
                                                                wheel=config.dbfs_artefact(cfg),

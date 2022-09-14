@@ -20,7 +20,7 @@ def test_infra_config(existing_job_config):
 def test_generates_dbfs_location_for_wheel(existing_job_config, config_value):
     dbfs_loc = config.dbfs_artefact(config_value)
 
-    assert "dbfs:/artifacts/job/job/dist/databricker-0.1.7-py3-none-any.whl" in dbfs_loc
+    assert "dbfs:/artifacts/job/job/dist/databricker-0.1.9-py3-none-any.whl" in dbfs_loc
 
 
 def test_builds_job_update_request_with_schedule(existing_job_config):
@@ -64,7 +64,7 @@ def test_create_job_fails_idempotent_check(existing_job_config):
     result = create_job_command.run()
 
     assert result.is_left()
-    assert result.error() == "Job is already created with ID: 314471534377936, delete the job first"
+    assert result.error() == "Job is already created with ID: 314471534377936. To fix delete the job first."
 
 def test_create_job(new_job_config, requests_mock, mocker):
     requests_mock.post("https://adb-575697367950122.2.azuredatabricks.net/api/2.0/jobs/create",
