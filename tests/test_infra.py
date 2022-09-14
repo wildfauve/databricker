@@ -79,6 +79,23 @@ def test_create_job(new_job_config, requests_mock, mocker):
     assert result.is_right()
 
 
+def test_create_job_with_existing_cluster(existing_cluster_job_config, requests_mock, mocker):
+    requests_mock.post("https://adb-575697367950122.2.azuredatabricks.net/api/2.0/jobs/create",
+                       json=job_create_result(),
+                       status_code=200,
+                       headers={'Content-Type': 'application/json; charset=utf-8'})
+
+    mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
+
+    result = create_job_command.run()
+
+    assert result.is_right()
+
+    _, create_job_req, _ = result.value
+
+    assert create_job_req['tasks'][0]['existing_cluster_id'] == "0914-001041-jbnfazlx"
+
+
 @pytest.fixture
 def config_value():
     return config.config_value().value
@@ -92,6 +109,13 @@ def existing_job_config():
 @pytest.fixture
 def new_job_config():
     config.configure(infra_config_file="tests/fixtures/infra_new.toml",
+                     dist="dist")
+    pass
+
+
+@pytest.fixture
+def existing_cluster_job_config():
+    config.configure(infra_config_file="tests/fixtures/infra_existing_cluster.toml",
                      dist="dist")
     pass
 

@@ -101,7 +101,8 @@ def configure_cluster(cfg, req):
         }
         req['tasks'][0]['new_cluster'] = cluster_cfg
         return req
-    breakpoint()
+    req['tasks'][0]['existing_cluster_id'] = job.existing_cluster_cfg(cfg)
+    return req
 
 
 def add_libraries(cfg, req):

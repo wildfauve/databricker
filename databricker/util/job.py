@@ -50,11 +50,18 @@ def email_notifications(config):
 def on_failure_notification(config):
     return fn.deep_get(config.infra, ['emailNotifications', 'on_failure'])
 
+
 def mavin_artefacts(config):
     return fn.deep_get(config.infra, ['job', 'mavin_artefacts'])
 
+
 def cluster_type(config):
     return ClusterType(fn.deep_get(config.infra, ['cluster', 'type']))
+
+
+def existing_cluster_cfg(cfg):
+    return fn.deep_get(cfg.infra, ['cluster', 'cluster_id'])
+
 
 def new_cluster_cfg(config):
     return (
@@ -62,6 +69,7 @@ def new_cluster_cfg(config):
         fn.deep_get(config.infra, ['cluster', 'node_type_id']),
         fn.deep_get(config.infra, ['cluster', 'num_workers'])
     )
+
 
 @monad.monadic_try(exception_test_fn=error.http_error_test_fn)
 def get_job(config):
