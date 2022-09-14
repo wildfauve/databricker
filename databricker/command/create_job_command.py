@@ -25,9 +25,8 @@ def run():
 def idempotent_check(cfg):
     job_id = job.job_id(cfg)
     if job_id:
-        msg = "Job is already created with ID: {}, delete the job first".format(job_id)
-        cli_helpers.echo(msg)
-        return monad.Left(msg)
+        cli_helpers.echo("Job found in toml file with ID: {}".format(job_id))
+        return monad.Left("Job is already created with ID: {}.  To fix delete the job first".format(job_id))
     return monad.Right(cfg)
 
 
@@ -50,6 +49,7 @@ def create(cfg_req_tuple: Tuple[value.ConfigValue, Dict]) -> Tuple[value.ConfigV
         return monad.Right((cfg, req, result.value.json()))
     cli_helpers.echo("Create Job Failure: {}".format(result.error().json()))
     return result
+
 
 def update_infra_toml(cfg_req_job_tuple: Tuple[value.ConfigValue, Dict, Dict]):
     cli_helpers.echo("Updating infra tomli with job id")
@@ -88,6 +88,7 @@ def add_task(cfg, req):
     req['tasks'] = [task]
     return req
 
+
 def configure_cluster(cfg, req):
     if job.cluster_type(cfg) == job.ClusterType.NEW:
         cli_helpers.echo("Building Cluster Configuration: NewCluster")
@@ -102,22 +103,29 @@ def configure_cluster(cfg, req):
         return req
     breakpoint()
 
+
 def add_libraries(cfg, req):
     """
     "libraries": [
         {
             "whl": "dbfs:/artifacts/cbor/cbor_builder/dist/cbor_builder-0.1.79-py3-none-any.whl"
+        },
+        {
+            "maven": {"coordinates": "com.azure.cosmos.spark:azure-cosmos-spark_3-2_2-12:4.12.1"}
         }
     ],
     """
-    libraries = [
-        {
-            "whl": config.dbfs_artefact(cfg)
-        }
-    ]
+    libraries = [{"whl": config.dbfs_artefact(cfg)}]
+    mavin_artefacts = job.mavin_artefacts(cfg)
+    if mavin_artefacts:
+        libs = reduce(add_mavin_artefact, mavin_artefacts, libraries)
     req['tasks'][0]['libraries'] = libraries
     return req
 
+
+def add_mavin_artefact(libraries, artefact):
+    libraries.append({'mavin': {'coordinates': artefact}})
+    return libraries
 
 
 def create_job_base_request(cfg):
