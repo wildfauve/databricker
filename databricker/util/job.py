@@ -1,13 +1,30 @@
 import requests
+from enum import Enum
 
 from . import monad, error, fn
 
 
+class ClusterType(Enum):
+    NEW = 'newCluster'
+    EXISTING = 'existingCluster'
+
+
 @monad.monadic_try(exception_test_fn=error.http_error_test_fn)
-def update_job_caller(config, request):
+def update_job_caller(config, req):
     hdrs = {"Authorization": "Bearer {}".format(config.databrickcfg.get('DEFAULT', 'token'))}
-    result = requests.post(url_for_job_update(config), json=request, headers=hdrs)
+    result = requests.post(url_for_job_update(config), json=req, headers=hdrs)
     return result
+
+
+@monad.monadic_try(exception_test_fn=error.http_error_test_fn)
+def create_job_caller(cfg, req):
+    hdrs = {"Authorization": "Bearer {}".format(cfg.databrickcfg.get('DEFAULT', 'token'))}
+    result = requests.post(url_for_job_create(cfg), json=req, headers=hdrs)
+    return result
+
+
+def job_name(config):
+    return fn.deep_get(config.infra, ['job', 'name'])
 
 
 def job_id(config):
@@ -17,6 +34,32 @@ def job_id(config):
 def task(config):
     return fn.deep_get(config.infra, ['job', 'task_key'])
 
+
+def entry_point(config):
+    return fn.deep_get(config.infra, ['job', 'entry_point'])
+
+
+def parameters(config):
+    return fn.deep_get(config.infra, ['job', 'parameters'])
+
+
+def email_notifications(config):
+    return fn.deep_get(config.infra, ['emailNotifications'])
+
+
+def on_failure_notification(config):
+    return fn.deep_get(config.infra, ['emailNotifications', 'on_failure'])
+
+
+def cluster_type(config):
+    return ClusterType(fn.deep_get(config.infra, ['cluster', 'type']))
+
+def new_cluster_cfg(config):
+    return (
+        fn.deep_get(config.infra, ['cluster', 'spark_version']),
+        fn.deep_get(config.infra, ['cluster', 'node_type_id']),
+        fn.deep_get(config.infra, ['cluster', 'num_workers'])
+    )
 
 @monad.monadic_try(exception_test_fn=error.http_error_test_fn)
 def get_job(config):
@@ -32,6 +75,10 @@ def url_for_job_get(config):
 
 def url_for_job_update(config):
     return "{cluster_url}/api/2.0/jobs/update".format(cluster_url=config.infra['cluster']['url'])
+
+
+def url_for_job_create(config):
+    return "{cluster_url}/api/2.0/jobs/create".format(cluster_url=config.infra['cluster']['url'])
 
 
 def update_job_request(job_id: str, task_key: str, wheel: str, schedule: str = None):

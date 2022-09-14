@@ -1,4 +1,5 @@
 import tomli
+import tomli_w
 from pathlib import Path
 import configparser
 import os
@@ -11,8 +12,10 @@ def configure(infra_config_file, dist="dist"):
     value.InfraConfig().configure(infra_config_file=infra_config_file, dist=dist)
     pass
 
+
 def infra_config():
     return value.InfraConfig()
+
 
 def config_value():
     infra = tomli.loads(Path().joinpath(value.InfraConfig().infra_config_file).read_text(encoding="utf-8"))
@@ -27,6 +30,16 @@ def config_value():
 
 def read_project_toml():
     return tomli.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+
+
+def update_infra_job_id(cfg, job_id):
+    cfg.infra['job']['id'] = job_id
+    write_infra_toml(cfg.infra)
+
+
+def write_infra_toml(toml: dict):
+    with open(infra_config().infra_config_file, mode="wb") as fp:
+        tomli_w.dump(toml, fp)
 
 
 @monad.monadic_try()

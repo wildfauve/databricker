@@ -1,0 +1,22 @@
+[job]
+name = "job"
+task_key= "job"
+package_name = "cbor_builder"
+entry_point = "job_main"
+parameters = ["--all-batches"]
+schedule.cron= "0 0 * * * ?"
+schedule.pause_status= "UNPAUSED"
+schedule.tz= "UTC"
+
+[cluster]
+url = "https://adb-575697367950122.2.azuredatabricks.net"
+type = "newCluster"
+spark_version = "11.1.x-scala2.12"
+num_workers = 1
+node_type_id = "Standard_DS3_v2"
+
+[emailNotifications]
+on_failure = "cperks@nzsuperfund.co.nz"
+
+[artefacts]
+root = "dbfs:/artifacts/job/job/dist"
