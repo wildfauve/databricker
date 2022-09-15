@@ -46,7 +46,7 @@ def test_create_job(new_job_config, requests_mock, mocker):
                                         'num_workers': 1},
                                     'libraries': [
                                         {
-                                            'whl': 'dbfs:/artifacts/job/job/dist/databricker-0.1.17-py3-none-any.whl'
+                                            'whl': 'dbfs:/artifacts/job/job/dist/databricker-0.1.19-py3-none-any.whl'
                                         },
                                         {'mavin': {
                                             'coordinates': 'com.azure.cosmos.spark:azure-cosmos-spark_3-2_2-12:4.12.1'}
