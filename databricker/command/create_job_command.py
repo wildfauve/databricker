@@ -1,7 +1,7 @@
 from typing import Dict, Tuple
 from functools import reduce
 
-from databricker.util import config, job, cli_helpers, monad, value, cluster
+from databricker.util import config, job, cli_helpers, monad, value, cluster, env
 
 
 def run():
@@ -17,10 +17,14 @@ def run():
 
     if result.is_right():
         cli_helpers.echo("Completed")
-    else:
-        cli_helpers.echo("Error: {}".format(result.error()))
-    return result
+        if env.Env().env == "test":
+            return result
+        sys.exit(0)
 
+    cli_helpers.echo("Error: {}".format(result.error()))
+    if env.Env().env == "test":
+        return result
+    sys.exit(1)
 
 def idempotent_check(cfg):
     job_id = job.job_id(cfg)

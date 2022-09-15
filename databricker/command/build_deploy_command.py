@@ -1,4 +1,6 @@
-from databricker.util import config, job, cli_helpers, monad, cluster
+import sys
+
+from databricker.util import config, job, cli_helpers, monad, cluster, env
 
 
 def run(bump, no_version=False):
@@ -23,10 +25,14 @@ def run(bump, no_version=False):
 
     if result.is_right():
         cli_helpers.echo("Completed")
-        return result
+        if env.Env().env == "test":
+            return result
+        sys.exit(0)
 
     cli_helpers.echo("Error: {}".format(result.error()))
-    return result
+    if env.Env().env == "test":
+        return result
+    sys.exit(1)
 
 
 def build_pipeline(cfg):
