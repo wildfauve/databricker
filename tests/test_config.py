@@ -23,3 +23,19 @@ def test_get_schedule_from_config(existing_job_config, config_value):
 
 def test_get_schedule(existing_job_config, config_value):
     assert config_value.infra['job']['schedule'] == {'cron': '0 0 * * * ?', 'pause_status': 'UNPAUSED', 'tz': 'UTC'}
+
+
+def test_determines_pipeline_type_for_job(existing_job_config, config_value):
+    pipeline = config.pipeline_type(config_value)
+
+    assert pipeline == config.PipelineType.JOB
+
+def test_determines_pipeline_type_for_lib(library_config, config_value):
+    pipeline = config.pipeline_type(config_value)
+
+    assert pipeline == config.PipelineType.LIB
+
+def test_cant_determine_pipeline_type(noop_config, config_value):
+    pipeline = config.pipeline_type(config_value)
+
+    assert pipeline == config.PipelineType.NOOP

@@ -4,9 +4,27 @@ from pathlib import Path
 import configparser
 import os
 import glob
+from enum import Enum
 
 from . import value, monad, cli_helpers, fn
 
+class PipelineType(Enum):
+    JOB = 'job'
+    LIB = 'library'
+    CLUSTERLIB = 'cluster_library'
+    NOOP = "noop"
+
+
+def pipeline_type(cfg):
+    if not set(['job', 'library', 'cluster_library']).intersection(set(cfg.infra.keys())):
+        return PipelineType('noop')
+    if 'job' in cfg.infra.keys():
+        return PipelineType('job')
+    if 'cluster_library' in cfg.infra.keys():
+        return PipelineType('cluster_library')
+    if 'library' in cfg.infra.keys():
+        return PipelineType('library')
+    return PipelineType('noop')
 
 def configure(infra_config_file, pyproject="pyproject.toml" ,dist="dist"):
     value.InfraConfig().configure(infra_config_file=infra_config_file, pyproject= pyproject, dist=dist)

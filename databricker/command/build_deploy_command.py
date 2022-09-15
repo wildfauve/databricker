@@ -1,7 +1,7 @@
 from databricker.util import config, job, cli_helpers, monad, fn
 
 
-def run(bump, no_version=False, no_job=False):
+def run(bump, no_version=False):
     """
     Builds and deploys the project.
 
@@ -16,9 +16,10 @@ def run(bump, no_version=False, no_job=False):
     cfg = config.config_value()
     if cfg.is_left():
         return None
-    cfg.value.replace('args', {'bump': bump, 'no_version': no_version, 'no_job': no_job})
 
-    result = cfg >> version >> build >> copy_to_dbfs >> update_job
+    cfg.value.replace('args', {'bump': bump, 'no_version': no_version})
+
+    result = cfg >> build_pipeline
 
     if result.is_right():
         cli_helpers.echo("Completed")
@@ -26,6 +27,41 @@ def run(bump, no_version=False, no_job=False):
 
     cli_helpers.echo("Error: {}".format(result.error()))
     return result
+
+
+def build_pipeline(cfg):
+    return pipeline_fn(config.pipeline_type(cfg))(cfg)
+
+
+def pipeline_fn(pipeline_type):
+    pipeline_map = {
+        config.PipelineType.LIB: build_deploy_library,
+        config.PipelineType.CLUSTERLIB: build_deploy_cluster_library,
+        config.PipelineType.JOB: build_deploy_job,
+        config.PipelineType.NOOP: noop_build_deploy
+    }
+    return pipeline_map[pipeline_type]
+
+
+def build_deploy_library(cfg):
+    cli_helpers.echo("Building and Deploying Library")
+    return monad.Right(cfg) >> version >> build >> copy_to_dbfs
+
+
+def build_deploy_cluster_library(cfg):
+    cli_helpers.echo("Building and Deploying Cluster Library")
+    breakpoint()
+
+
+def build_deploy_job(cfg):
+    cli_helpers.echo("Building and Deploying Library")
+    return monad.Right(cfg) >> version >> build >> copy_to_dbfs >> update_job
+
+
+def noop_build_deploy(cfg):
+    cli_helpers.echo(
+        "The infra toml does not contain a recognised deployment type, must be a job, library or cluster-library")
+    return monad.Right(None)
 
 
 def version(cfg):
@@ -66,10 +102,6 @@ def copy_to_dbfs(cfg):
 
 
 def update_job(cfg):
-    if args_switch_check(cfg, 'no_job', False):
-        cli_helpers.echo("No Job Update performed as this is a library")
-        return monad.Right(None)
-
     cli_helpers.echo(
         "Update Job Artefact: {}, {}, {}".format(job.job_id(cfg), job.task(cfg), config.dbfs_artefact(cfg)))
 

@@ -1,5 +1,0 @@
-[cluster]
-url = "https://example.databricks.com"
-
-[artefacts]
-root = "dbfs:/artifacts/library/library/dist"

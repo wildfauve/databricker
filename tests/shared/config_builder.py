@@ -34,7 +34,15 @@ def existing_cluster_job_config():
 
 @pytest.fixture
 def library_config():
-    config.configure(infra_config_file="tests/fixtures/infra_library.toml",
+    config.configure(infra_config_file="tests/fixtures/library.toml",
+                     pyproject="tests/fixtures/test_pyproject.toml",
+                     dist="tests/fixtures/test_dist")
+    pass
+
+
+@pytest.fixture
+def noop_config():
+    config.configure(infra_config_file="tests/fixtures/noop_infra.toml",
                      pyproject="tests/fixtures/test_pyproject.toml",
                      dist="tests/fixtures/test_dist")
     pass

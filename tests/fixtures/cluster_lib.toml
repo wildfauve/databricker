@@ -1,0 +1,9 @@
+[cluster_library]
+name = "a_lib"
+
+[cluster]
+url
+cluster_id = "spark_cluster_1"
+
+[artefacts]
+root = "dbfs:/artifacts/common/python"

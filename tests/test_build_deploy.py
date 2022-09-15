@@ -77,7 +77,7 @@ def test_deploys_a_library(library_config, mocker, requests_mock):
 
     mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
 
-    result = build_deploy_command.run(bump="patch", no_version=True, no_job=True)
+    result = build_deploy_command.run(bump="patch", no_version=True)
 
     assert result.is_right()
 
@@ -85,6 +85,12 @@ def test_deploys_a_library(library_config, mocker, requests_mock):
 
     assert len(cmds) == 2
     assert not req_mock.request_history
+
+
+def test_noop_configuration(noop_config):
+    result = build_deploy_command.run(bump="patch")
+
+    assert result.is_right()
 
 
 #

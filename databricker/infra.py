@@ -32,8 +32,6 @@ def create_job():
               help="States the version update type to be passed to the poetry version command.  Default is patch")
 @click.option("--no-version", "-n", 'no_version', flag_value="no_version", default=False,
               help="Don't version the artefact.  This assumes that the version has already been updated")
-@click.option("--no-job", "-n", 'no_job', flag_value="no_job", default=False,
-              help="This isnt a job, therefore just push the artefact to DBFS.")
 def build_deploy(bump, no_version, no_job):
     """
     Builds and deploys the project.

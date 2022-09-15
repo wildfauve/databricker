@@ -1,0 +1,8 @@
+[library]
+name = "lib-name"
+
+[cluster]
+url = "https://example.databricks.com"
+
+[artefacts]
+root = "dbfs:/artifacts/common/python"
