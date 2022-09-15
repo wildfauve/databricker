@@ -4,10 +4,6 @@ version = "0.1.22"
 description = ""
 authors = ["Col Perks <wild.fauve@gmail.com>"]
 
-[tool.poetry.scripts]
-infra = "_infra.cli:infra_cli"
-
-
 [tool.poetry.dependencies]
 python = "^3.9"
 pendulum = "^2.1.2"
