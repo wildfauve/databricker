@@ -91,10 +91,10 @@ def test_serialises_additional_artefacts(existing_cluster_job_config, requests_m
 
     libs = requests_mock.request_history[0].json()['tasks'][0]['libraries']
 
-    assert len(libs) == 4
+    assert len(libs) == 5
 
     expected_artefacts = [
-        {'whl': 'dbfs:/artifacts/job/job/dist/databricker-0.1.18-py3-none-any.whl'},
+        {'whl': 'dbfs:/artifacts/job/job/dist/databricker-0.1.20-py3-none-any.whl'},
         {'maven': {'coordinates': 'java-artefact-1'}},
         {'maven': {'coordinates': 'java_artefact_2'}},
         {'whl': 'wheel-1'},
