@@ -52,11 +52,11 @@ def on_failure_notification(config):
 
 
 def mavin_artefacts(config):
-    return fn.deep_get(config.infra, ['job', 'mavin_artefacts'])
+    return fn.deep_get(config.infra, ['artefacts', 'mavin_artefacts'])
 
 
 def whl_artefacts(config):
-    return fn.deep_get(config.infra, ['job', 'whl_artefacts'])
+    return fn.deep_get(config.infra, ['artefacts', 'whl_artefacts'])
 
 
 def cluster_type(config):
