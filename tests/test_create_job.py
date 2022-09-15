@@ -14,7 +14,7 @@ def test_create_job_fails_idempotent_check(existing_job_config):
 
 
 def test_create_job(new_job_config, requests_mock, mocker):
-    req_mock = requests_mock.post("https://adb-575697367950122.2.azuredatabricks.net/api/2.0/jobs/create",
+    req_mock = requests_mock.post("https://example.databricks.com/api/2.0/jobs/create",
                                   json=job_create_result(),
                                   status_code=200,
                                   headers={'Content-Type': 'application/json; charset=utf-8'})
@@ -63,7 +63,7 @@ def test_create_job(new_job_config, requests_mock, mocker):
 
 
 def test_create_job_with_existing_cluster(existing_cluster_job_config, requests_mock, mocker):
-    requests_mock.post("https://adb-575697367950122.2.azuredatabricks.net/api/2.0/jobs/create",
+    requests_mock.post("https://example.databricks.com/api/2.0/jobs/create",
                        json=job_create_result(),
                        status_code=200,
                        headers={'Content-Type': 'application/json; charset=utf-8'})
@@ -77,6 +77,31 @@ def test_create_job_with_existing_cluster(existing_cluster_job_config, requests_
     _, create_job_req, _ = result.value
 
     assert create_job_req['tasks'][0]['existing_cluster_id'] == "0914-001041-jbnfazlx"
+
+
+def test_serialises_additional_artefacts(existing_cluster_job_config, requests_mock, mocker):
+    requests_mock.post("https://example.databricks.com/api/2.0/jobs/create",
+                       json=job_create_result(),
+                       status_code=200,
+                       headers={'Content-Type': 'application/json; charset=utf-8'})
+
+    mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
+
+    create_job_command.run()
+
+    libs = requests_mock.request_history[0].json()['tasks'][0]['libraries']
+
+    assert len(libs) == 4
+
+    expected_artefacts = [
+        {'whl': 'dbfs:/artifacts/job/job/dist/databricker-0.1.18-py3-none-any.whl'},
+        {'maven': {'coordinates': 'java-artefact-1'}},
+        {'maven': {'coordinates': 'java_artefact_2'}},
+        {'whl': 'wheel-1'},
+        {'whl': 'wheel-2'}
+    ]
+
+    assert libs == expected_artefacts
 
 
 def job_create_result():

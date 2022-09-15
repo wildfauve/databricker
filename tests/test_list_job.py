@@ -9,7 +9,7 @@ def setup_module():
 
 
 def test_list_job(existing_job_config, requests_mock):
-    requests_mock.get("https://adb-575697367950122.2.azuredatabricks.net/api/2.0/jobs/get",
+    requests_mock.get("https://example.databricks.com/api/2.0/jobs/get",
                       json=job_list_result(),
                       status_code=200,
                       headers={'Content-Type': 'application/json; charset=utf-8'})

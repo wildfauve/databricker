@@ -9,7 +9,7 @@ schedule.pause_status = "UNPAUSED"
 schedule.tz = "UTC"
 
 [cluster]
-url = "https://adb-575697367950122.2.azuredatabricks.net"
+url = "https://example.databricks.com"
 type = "newCluster"
 spark_version = "11.1.x-scala2.12"
 num_workers = 1

@@ -10,7 +10,7 @@ class CliCommandSpy(singleton.Singleton):
 
 def test_builds_and_deploys(existing_job_config, mocker, requests_mock):
     CliCommandSpy().commands = []
-    req_mock = requests_mock.post("https://adb-575697367950122.2.azuredatabricks.net/api/2.0/jobs/update",
+    req_mock = requests_mock.post("https://example.databricks.com/api/2.0/jobs/update",
                                   json={},
                                   status_code=200,
                                   headers={'Content-Type': 'application/json; charset=utf-8'})
@@ -37,7 +37,7 @@ def test_builds_and_deploys(existing_job_config, mocker, requests_mock):
 
 def test_does_not_bump_version(existing_job_config, mocker, requests_mock):
     CliCommandSpy().commands = []
-    req_mock = requests_mock.post("https://adb-575697367950122.2.azuredatabricks.net/api/2.0/jobs/update",
+    req_mock = requests_mock.post("https://example.databricks.com/api/2.0/jobs/update",
                                   json={},
                                   status_code=200,
                                   headers={'Content-Type': 'application/json; charset=utf-8'})
@@ -62,7 +62,7 @@ def test_does_not_bump_version(existing_job_config, mocker, requests_mock):
 
 def test_error_on_databricks_cp(existing_job_config, mocker, requests_mock):
     CliCommandSpy().commands = []
-    req_mock = requests_mock.post("https://adb-575697367950122.2.azuredatabricks.net/api/2.0/jobs/update",
+    req_mock = requests_mock.post("https://example.databricks.com/api/2.0/jobs/update",
                                   json={},
                                   status_code=200,
                                   headers={'Content-Type': 'application/json; charset=utf-8'})
@@ -76,7 +76,7 @@ def test_error_on_databricks_cp(existing_job_config, mocker, requests_mock):
 
 def test_deploys_a_library(library_config, mocker, requests_mock):
     CliCommandSpy().commands = []
-    req_mock = requests_mock.post("https://adb-575697367950122.2.azuredatabricks.net/api/2.0/jobs/update",
+    req_mock = requests_mock.post("https://example.databricks.com/api/2.0/jobs/update",
                                   json={},
                                   status_code=200,
                                   headers={'Content-Type': 'application/json; charset=utf-8'})
