@@ -1,12 +1,12 @@
 [job]
 name = "job"
-task_key= "job"
+task_key = "job"
 package_name = "cbor_builder"
 entry_point = "job_main"
 parameters = ["--all-batches"]
-schedule.cron= "0 0 * * * ?"
-schedule.pause_status= "UNPAUSED"
-schedule.tz= "UTC"
+schedule.cron = "0 0 * * * ?"
+schedule.pause_status = "UNPAUSED"
+schedule.tz = "UTC"
 
 [cluster]
 url = "https://adb-575697367950122.2.azuredatabricks.net"
@@ -20,5 +20,7 @@ on_failure = "admin@example.com"
 
 [artefacts]
 root = "dbfs:/artifacts/job/job/dist"
-mavin_artefacts = ["com.azure.cosmos.spark:azure-cosmos-spark_3-2_2-12:4.12.1"]
-whl_artefacts = ["dbfs:/artifacts/common/python/databricker-0.1.9-py3-none-any.whl"]
+maven_artefacts = ["com.azure.cosmos.spark:azure-cosmos-spark_3-2_2-12:4.12.1"]
+whl_artefacts = [
+    "dbfs:/artifacts/common/python/databricker-0.1.9-py3-none-any.whl",
+]

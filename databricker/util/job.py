@@ -51,8 +51,8 @@ def on_failure_notification(config):
     return fn.deep_get(config.infra, ['emailNotifications', 'on_failure'])
 
 
-def mavin_artefacts(config):
-    return fn.deep_get(config.infra, ['artefacts', 'mavin_artefacts'])
+def maven_artefacts(config):
+    return fn.deep_get(config.infra, ['artefacts', 'maven_artefacts'])
 
 
 def whl_artefacts(config):

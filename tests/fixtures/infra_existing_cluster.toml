@@ -1,13 +1,13 @@
 [job]
 name = "job"
-task_key= "job"
+task_key = "job"
 package_name = "cbor_builder"
 entry_point = "job_main"
 parameters = ["--all-batches"]
-schedule.cron= "0 0 * * * ?"
-schedule.pause_status= "UNPAUSED"
-schedule.tz= "UTC"
-mavin_artefacts = ["com.azure.cosmos.spark:azure-cosmos-spark_3-2_2-12:4.12.1"]
+schedule.cron = "0 0 * * * ?"
+schedule.pause_status = "UNPAUSED"
+schedule.tz = "UTC"
+maven_artefacts = ["com.azure.cosmos.spark:azure-cosmos-spark_3-2_2-12:4.12.1"]
 
 [cluster]
 url = "https://adb-575697367950122.2.azuredatabricks.net"
