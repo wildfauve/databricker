@@ -113,6 +113,12 @@ def library_builder(cfg):
     return libraries
 
 
+def tag_builder(cfg):
+    tags = fn.deep_get(cfg.infra, ['job', 'tags'])
+    if not tags:
+        return {}
+    return tags
+
 def add_maven_artefact(libraries, artefact):
     libraries.append({'maven': {'coordinates': artefact}})
     return libraries
@@ -132,7 +138,8 @@ def update_job_request(cfg, job_id: str, task_key: str, schedule: str = None):
                     "task_key": task_key,
                     "libraries": library_builder(cfg)
                 }
-            ]
+            ],
+            "tags": tag_builder(cfg)
         }
     }
     if schedule:

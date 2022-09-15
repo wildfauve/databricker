@@ -63,7 +63,8 @@ def request_builder_fns():
     return [add_notifications,
             add_task,
             configure_cluster,
-            add_libraries]
+            add_libraries,
+            add_tags]
 
 
 def add_notifications(cfg, req):
@@ -120,6 +121,9 @@ def add_libraries(cfg, req):
     req['tasks'][0]['libraries'] = libs
     return req
 
+def add_tags(cfg, req):
+    req['tags'] = job.tag_builder(cfg)
+    return req
 
 def create_job_base_request(cfg):
     return {

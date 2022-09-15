@@ -57,6 +57,7 @@ def test_create_job(new_job_config, requests_mock, mocker):
                                     ]
                                     }
                                ],
+                               'tags': {},
                                'format': 'SINGLE_TASK'}
 
     assert req_mock.request_history[0].json() == expected_create_request
@@ -103,6 +104,26 @@ def test_serialises_additional_artefacts(existing_cluster_job_config, requests_m
 
     assert libs == expected_artefacts
 
+def test_adds_tags_to_job(existing_cluster_job_config, requests_mock, mocker):
+    requests_mock.post("https://example.databricks.com/api/2.0/jobs/create",
+                       json=job_create_result(),
+                       status_code=200,
+                       headers={'Content-Type': 'application/json; charset=utf-8'})
+
+    mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
+
+    create_job_command.run()
+
+    tags = requests_mock.request_history[0].json()['tags']
+
+    assert tags == {'domain': 'portfolio', 'team': 'awesome', 'dataproduct': 'cbor'}
+
+
+
+
+#
+# Helpers
+#
 
 def job_create_result():
     return {
