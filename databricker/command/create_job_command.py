@@ -116,25 +116,9 @@ def add_libraries(cfg, req):
         }
     ],
     """
-    libraries = [{"whl": config.dbfs_artefact(cfg)}]
-    maven_artefacts = job.maven_artefacts(cfg)
-    whl_artefacts = job.whl_artefacts(cfg)
-    if maven_artefacts:
-        reduce(add_maven_artefact, maven_artefacts, libraries)
-    if whl_artefacts:
-        reduce(add_whl_artefact, whl_artefacts, libraries)
-    req['tasks'][0]['libraries'] = libraries
+    libs = job.library_builder(cfg)
+    req['tasks'][0]['libraries'] = libs
     return req
-
-
-def add_maven_artefact(libraries, artefact):
-    libraries.append({'maven': {'coordinates': artefact}})
-    return libraries
-
-
-def add_whl_artefact(libraries, artefact):
-    libraries.append({'whl': artefact})
-    return libraries
 
 
 def create_job_base_request(cfg):

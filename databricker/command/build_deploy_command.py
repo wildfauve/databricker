@@ -72,10 +72,9 @@ def update_job(cfg):
 
     cli_helpers.echo(
         "Update Job Artefact: {}, {}, {}".format(job.job_id(cfg), job.task(cfg), config.dbfs_artefact(cfg)))
-    result = job.update_job_caller(cfg, job.update_job_request(job_id=job.job_id(cfg),
-                                                               task_key=job.task(cfg),
-                                                               wheel=config.dbfs_artefact(cfg),
-                                                               schedule=config.schedule_config(cfg)))
+
+    result = job.update_job(cfg)
+
     if result.is_right():
         cli_helpers.echo("Update Job Artefact Success")
         return monad.Right(cfg)

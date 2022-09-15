@@ -1,7 +1,8 @@
 import requests
 from enum import Enum
+from functools import reduce
 
-from . import monad, error, fn
+from . import monad, error, fn, config
 
 
 class ClusterType(Enum):
@@ -9,10 +10,17 @@ class ClusterType(Enum):
     EXISTING = 'existingCluster'
 
 
+def update_job(cfg):
+    return update_job_caller(cfg, update_job_request(cfg=cfg,
+                                                     job_id=job_id(cfg),
+                                                     task_key=task(cfg),
+                                                     schedule=config.schedule_config(cfg)))
+
+
 @monad.monadic_try(exception_test_fn=error.http_error_test_fn)
-def update_job_caller(config, req):
-    hdrs = {"Authorization": "Bearer {}".format(config.databrickcfg.get('DEFAULT', 'token'))}
-    result = requests.post(url_for_job_update(config), json=req, headers=hdrs)
+def update_job_caller(cfg, req):
+    hdrs = {"Authorization": "Bearer {}".format(cfg.databrickcfg.get('DEFAULT', 'token'))}
+    result = requests.post(url_for_job_update(cfg), json=req, headers=hdrs)
     return result
 
 
@@ -23,90 +31,106 @@ def create_job_caller(cfg, req):
     return result
 
 
-def job_name(config):
-    return fn.deep_get(config.infra, ['job', 'name'])
+def job_name(cfg):
+    return fn.deep_get(cfg.infra, ['job', 'name'])
 
 
-def job_id(config):
-    return fn.deep_get(config.infra, ['job', 'id'])
+def job_id(cfg):
+    return fn.deep_get(cfg.infra, ['job', 'id'])
 
 
-def task(config):
-    return fn.deep_get(config.infra, ['job', 'task_key'])
+def task(cfg):
+    return fn.deep_get(cfg.infra, ['job', 'task_key'])
 
 
-def entry_point(config):
-    return fn.deep_get(config.infra, ['job', 'entry_point'])
+def entry_point(cfg):
+    return fn.deep_get(cfg.infra, ['job', 'entry_point'])
 
 
-def parameters(config):
-    return fn.deep_get(config.infra, ['job', 'parameters'])
+def parameters(cfg):
+    return fn.deep_get(cfg.infra, ['job', 'parameters'])
 
 
-def email_notifications(config):
-    return fn.deep_get(config.infra, ['emailNotifications'])
+def email_notifications(cfg):
+    return fn.deep_get(cfg.infra, ['emailNotifications'])
 
 
-def on_failure_notification(config):
-    return fn.deep_get(config.infra, ['emailNotifications', 'on_failure'])
+def on_failure_notification(cfg):
+    return fn.deep_get(cfg.infra, ['emailNotifications', 'on_failure'])
 
 
-def maven_artefacts(config):
-    return fn.deep_get(config.infra, ['artefacts', 'maven_artefacts'])
+def maven_artefacts(cfg):
+    return fn.deep_get(cfg.infra, ['artefacts', 'maven_artefacts'])
 
 
-def whl_artefacts(config):
-    return fn.deep_get(config.infra, ['artefacts', 'whl_artefacts'])
+def whl_artefacts(cfg):
+    return fn.deep_get(cfg.infra, ['artefacts', 'whl_artefacts'])
 
 
-def cluster_type(config):
-    return ClusterType(fn.deep_get(config.infra, ['cluster', 'type']))
+def cluster_type(cfg):
+    return ClusterType(fn.deep_get(cfg.infra, ['cluster', 'type']))
 
 
 def existing_cluster_cfg(cfg):
     return fn.deep_get(cfg.infra, ['cluster', 'cluster_id'])
 
 
-def new_cluster_cfg(config):
+def new_cluster_cfg(cfg):
     return (
-        fn.deep_get(config.infra, ['cluster', 'spark_version']),
-        fn.deep_get(config.infra, ['cluster', 'node_type_id']),
-        fn.deep_get(config.infra, ['cluster', 'num_workers'])
+        fn.deep_get(cfg.infra, ['cluster', 'spark_version']),
+        fn.deep_get(cfg.infra, ['cluster', 'node_type_id']),
+        fn.deep_get(cfg.infra, ['cluster', 'num_workers'])
     )
 
 
 @monad.monadic_try(exception_test_fn=error.http_error_test_fn)
-def get_job(config):
-    hdrs = {"Authorization": "Bearer {}".format(config.databrickcfg.get('DEFAULT', 'token'))}
-    result = requests.get(url_for_job_get(config), params={"job_id": job_id(config)}, headers=hdrs)
+def get_job(cfg):
+    hdrs = {"Authorization": "Bearer {}".format(cfg.databrickcfg.get('DEFAULT', 'token'))}
+    result = requests.get(url_for_job_get(cfg), params={"job_id": job_id(cfg)}, headers=hdrs)
 
     return result
 
 
-def url_for_job_get(config):
-    return "{cluster_url}/api/2.0/jobs/get".format(cluster_url=config.infra['cluster']['url'])
+def url_for_job_get(cfg):
+    return "{cluster_url}/api/2.0/jobs/get".format(cluster_url=cfg.infra['cluster']['url'])
 
 
-def url_for_job_update(config):
-    return "{cluster_url}/api/2.0/jobs/update".format(cluster_url=config.infra['cluster']['url'])
+def url_for_job_update(cfg):
+    return "{cluster_url}/api/2.0/jobs/update".format(cluster_url=cfg.infra['cluster']['url'])
 
 
-def url_for_job_create(config):
-    return "{cluster_url}/api/2.0/jobs/create".format(cluster_url=config.infra['cluster']['url'])
+def url_for_job_create(cfg):
+    return "{cluster_url}/api/2.0/jobs/create".format(cluster_url=cfg.infra['cluster']['url'])
+
+def library_builder(cfg):
+    libraries = [{"whl": config.dbfs_artefact(cfg)}]
+    maven = maven_artefacts(cfg)
+    python = whl_artefacts(cfg)
+    if maven:
+        reduce(add_maven_artefact, maven, libraries)
+    if python:
+        reduce(add_whl_artefact, python, libraries)
+    return libraries
 
 
-def update_job_request(job_id: str, task_key: str, wheel: str, schedule: str = None):
+def add_maven_artefact(libraries, artefact):
+    libraries.append({'maven': {'coordinates': artefact}})
+    return libraries
+
+
+def add_whl_artefact(libraries, artefact):
+    libraries.append({'whl': artefact})
+    return libraries
+
+
+def update_job_request(cfg, job_id: str, task_key: str, schedule: str = None):
     base_job = {
         "job_id": job_id,
         "new_settings": {
             "tasks": [
                 {
                     "task_key": task_key,
-                    "libraries": [
-                        {
-                            "whl": wheel
-                        }
-                    ]
+                    "libraries": library_builder(cfg)
                 }
             ]
         }
