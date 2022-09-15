@@ -55,6 +55,10 @@ def mavin_artefacts(config):
     return fn.deep_get(config.infra, ['job', 'mavin_artefacts'])
 
 
+def whl_artefacts(config):
+    return fn.deep_get(config.infra, ['job', 'whl_artefacts'])
+
+
 def cluster_type(config):
     return ClusterType(fn.deep_get(config.infra, ['cluster', 'type']))
 

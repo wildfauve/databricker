@@ -1,7 +1,7 @@
-from databricker.util import config, job, cli_helpers, monad
+from databricker.util import config, job, cli_helpers, monad, fn
 
 
-def run(bump):
+def run(bump, no_version=False, no_job=False):
     """
     Builds and deploys the project.
 
@@ -16,18 +16,22 @@ def run(bump):
     cfg = config.config_value()
     if cfg.is_left():
         return None
-    cfg.value.replace('args', {'bump': bump})
+    cfg.value.replace('args', {'bump': bump, 'no_version': no_version, 'no_job': no_job})
 
     result = cfg >> version >> build >> copy_to_dbfs >> update_job
 
     if result.is_right():
         cli_helpers.echo("Completed")
-    else:
-        cli_helpers.echo("Error: {}".format(result.error()))
-    pass
+        return result
+
+    cli_helpers.echo("Error: {}".format(result.error()))
+    return result
 
 
 def version(cfg):
+    if args_switch_check(cfg, 'no_version', False):
+        cli_helpers.echo("No Version update performed")
+        return monad.Right(cfg)
     result = cli_helpers.run_command(["poetry", "version", cfg.args['bump']], message="Bump Version")
     if result.is_right():
         return monad.Right(cfg)
@@ -62,15 +66,25 @@ def copy_to_dbfs(cfg):
 
 
 def update_job(cfg):
+    if args_switch_check(cfg, 'no_job', False):
+        cli_helpers.echo("No Job Update performed as this is a library")
+        return monad.Right(None)
+
     cli_helpers.echo(
         "Update Job Artefact: {}, {}, {}".format(job.job_id(cfg), job.task(cfg), config.dbfs_artefact(cfg)))
     result = job.update_job_caller(cfg, job.update_job_request(job_id=job.job_id(cfg),
                                                                task_key=job.task(cfg),
                                                                wheel=config.dbfs_artefact(cfg),
                                                                schedule=config.schedule_config(cfg)))
-
     if result.is_right():
         cli_helpers.echo("Update Job Artefact Success")
         return monad.Right(cfg)
     cli_helpers.echo("Update Job Artefact Failure: {}".format(result.error().json()))
     return result
+
+
+def args_switch_check(cfg, bool_arg_name, missing_is: bool = True):
+    bool_arg = cfg.args.get(bool_arg_name)
+    if bool_arg:
+        return True
+    return missing_is

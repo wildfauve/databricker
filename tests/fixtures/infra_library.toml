@@ -1,0 +1,5 @@
+[cluster]
+url = "https://adb-575697367950122.2.azuredatabricks.net"
+
+[artefacts]
+root = "dbfs:/artifacts/library/library/dist"

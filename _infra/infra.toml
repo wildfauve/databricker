@@ -1,0 +1,14 @@
+[job]
+
+[artefacts]
+root = "dbfs:/artifacts/common/python"
+
+[emailNotifications]
+on_failure = "cperks@nzsuperfund.co.nz"
+
+[cluster]
+url = "https://adb-575697367950122.2.azuredatabricks.net"
+type = "newCluster"
+spark_version = "11.1.x-scala2.12"
+num_workers = 1
+node_type_id = "Standard_DS3_v2"

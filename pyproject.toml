@@ -1,8 +1,12 @@
 [tool.poetry]
 name = "databricker"
-version = "0.1.12"
+version = "0.1.17"
 description = ""
 authors = ["Col Perks <wild.fauve@gmail.com>"]
+
+[tool.poetry.scripts]
+infra = "_infra.cli:infra_cli"
+
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -17,6 +21,7 @@ tomli-w = "^1.0.0"
 pytest = "^5.2"
 requests-mock = "^1.10.0"
 pytest-mock = "^3.8.2"
+databricks-cli = "^0.17.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
