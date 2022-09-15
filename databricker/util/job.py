@@ -2,12 +2,7 @@ import requests
 from enum import Enum
 from functools import reduce
 
-from . import monad, error, fn, config
-
-
-class ClusterType(Enum):
-    NEW = 'newCluster'
-    EXISTING = 'existingCluster'
+from . import monad, error, fn, config, artefacts
 
 
 def update_job(cfg):
@@ -59,29 +54,6 @@ def on_failure_notification(cfg):
     return fn.deep_get(cfg.infra, ['emailNotifications', 'on_failure'])
 
 
-def maven_artefacts(cfg):
-    return fn.deep_get(cfg.infra, ['artefacts', 'maven_artefacts'])
-
-
-def whl_artefacts(cfg):
-    return fn.deep_get(cfg.infra, ['artefacts', 'whl_artefacts'])
-
-
-def cluster_type(cfg):
-    return ClusterType(fn.deep_get(cfg.infra, ['cluster', 'type']))
-
-
-def existing_cluster_cfg(cfg):
-    return fn.deep_get(cfg.infra, ['cluster', 'cluster_id'])
-
-
-def new_cluster_cfg(cfg):
-    return (
-        fn.deep_get(cfg.infra, ['cluster', 'spark_version']),
-        fn.deep_get(cfg.infra, ['cluster', 'node_type_id']),
-        fn.deep_get(cfg.infra, ['cluster', 'num_workers'])
-    )
-
 
 @monad.monadic_try(exception_test_fn=error.http_error_test_fn)
 def get_job(cfg):
@@ -104,8 +76,8 @@ def url_for_job_create(cfg):
 
 def library_builder(cfg):
     libraries = [{"whl": config.dbfs_artefact(cfg)}]
-    maven = maven_artefacts(cfg)
-    python = whl_artefacts(cfg)
+    maven = artefacts.maven_artefacts(cfg)
+    python = artefacts.whl_artefacts(cfg)
     if maven:
         reduce(add_maven_artefact, maven, libraries)
     if python:

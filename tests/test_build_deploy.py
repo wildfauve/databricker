@@ -68,13 +68,8 @@ def test_error_on_databricks_cp(existing_job_config, mocker, requests_mock):
     assert result.error() == "Failure executing command poetry run databricks fs cp ..."
 
 
-def test_deploys_a_library(library_config, mocker, requests_mock):
+def test_deploys_a_library(library_config, mocker):
     CliCommandSpy().commands = []
-    req_mock = requests_mock.post("https://example.databricks.com/api/2.0/jobs/update",
-                                  json={},
-                                  status_code=200,
-                                  headers={'Content-Type': 'application/json; charset=utf-8'})
-
     mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
 
     result = build_deploy_command.run(bump="patch", no_version=True)
@@ -84,7 +79,29 @@ def test_deploys_a_library(library_config, mocker, requests_mock):
     cmds = list(map(lambda cmd: cmd['cmd'], CliCommandSpy().commands))
 
     assert len(cmds) == 2
-    assert not req_mock.request_history
+
+
+def test_deploys_a_cluster_library(cluster_library_config, mocker, requests_mock):
+    CliCommandSpy().commands = []
+    req_mock = requests_mock.post("https://example.databricks.com/api/2.0/libraries/install",
+                                  json={},
+                                  status_code=200,
+                                  headers={'Content-Type': 'application/json; charset=utf-8'})
+
+    mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
+
+    result = build_deploy_command.run(bump="patch", no_version=True)
+
+    cmds = list(map(lambda cmd: cmd['cmd'], CliCommandSpy().commands))
+
+    assert cmds == [['poetry', 'build'],
+                    ['poetry', 'run', 'databricks', 'fs', 'cp', 'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
+                     'dbfs:/artifacts/common/python']]
+
+    expected_request = {'cluster_id': 'spark_cluster_1',
+                        'libraries': [{'whl': 'dbfs:/artifacts/common/python/app-0.1.0-py3-none-any.whl'}]}
+
+    assert req_mock.request_history[0].json() == expected_request
 
 
 def test_noop_configuration(noop_config):

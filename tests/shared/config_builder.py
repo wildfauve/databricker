@@ -39,6 +39,13 @@ def library_config():
                      dist="tests/fixtures/test_dist")
     pass
 
+@pytest.fixture
+def cluster_library_config():
+    config.configure(infra_config_file="tests/fixtures/cluster_lib.toml",
+                     pyproject="tests/fixtures/test_pyproject.toml",
+                     dist="tests/fixtures/test_dist")
+    pass
+
 
 @pytest.fixture
 def noop_config():

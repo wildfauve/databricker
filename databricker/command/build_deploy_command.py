@@ -1,4 +1,4 @@
-from databricker.util import config, job, cli_helpers, monad, fn
+from databricker.util import config, job, cli_helpers, monad, cluster
 
 
 def run(bump, no_version=False):
@@ -50,7 +50,7 @@ def build_deploy_library(cfg):
 
 def build_deploy_cluster_library(cfg):
     cli_helpers.echo("Building and Deploying Cluster Library")
-    breakpoint()
+    return monad.Right(cfg) >> version >> build >> copy_to_dbfs >> install_on_cluster
 
 
 def build_deploy_job(cfg):
@@ -111,6 +111,20 @@ def update_job(cfg):
         cli_helpers.echo("Update Job Artefact Success")
         return monad.Right(cfg)
     cli_helpers.echo("Update Job Artefact Failure: {}".format(result.error().json()))
+    return result
+
+
+def install_on_cluster(cfg):
+    cli_helpers.echo(
+        "Install library on cluster: {}, {}".format(cluster.cluster_id(cfg),
+                                                    config.dbfs_artefact(cfg)))
+
+    result = cluster.install_library(cfg)
+
+    if result.is_right():
+        cli_helpers.echo("Library Installed on Cluster")
+        return monad.Right(cfg)
+    cli_helpers.echo("Library installation failed: {}".format(result.error().json()))
     return result
 
 

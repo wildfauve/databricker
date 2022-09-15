@@ -1,7 +1,7 @@
 from typing import Dict, Tuple
 from functools import reduce
 
-from databricker.util import config, job, cli_helpers, monad, value
+from databricker.util import config, job, cli_helpers, monad, value, cluster
 
 
 def run():
@@ -91,10 +91,10 @@ def add_task(cfg, req):
 
 
 def configure_cluster(cfg, req):
-    if job.cluster_type(cfg) == job.ClusterType.NEW:
+    if cluster.cluster_type(cfg) == cluster.ClusterType.NEW:
         cli_helpers.echo("Building Cluster Configuration: NewCluster")
 
-        spark_version, node_type, num_workers = job.new_cluster_cfg(cfg)
+        spark_version, node_type, num_workers = cluster.new_cluster_cfg(cfg)
         cluster_cfg = {
             "spark_version": spark_version,
             "node_type_id": node_type,
@@ -102,7 +102,7 @@ def configure_cluster(cfg, req):
         }
         req['tasks'][0]['new_cluster'] = cluster_cfg
         return req
-    req['tasks'][0]['existing_cluster_id'] = job.existing_cluster_cfg(cfg)
+    req['tasks'][0]['existing_cluster_id'] = cluster.cluster_id(cfg)
     return req
 
 

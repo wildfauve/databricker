@@ -2,7 +2,7 @@
 name = "a_lib"
 
 [cluster]
-url
+url = "https://example.databricks.com"
 cluster_id = "spark_cluster_1"
 
 [artefacts]
