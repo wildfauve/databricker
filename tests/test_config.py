@@ -14,7 +14,7 @@ def test_infra_config(existing_job_config):
 def test_generates_dbfs_location_for_wheel(existing_job_config, config_value):
     dbfs_loc = config.dbfs_artefact(config_value)
 
-    assert "dbfs:/artifacts/job/job/dist/databricker" in dbfs_loc
+    assert "dbfs:/artifacts/job/job/dist/app-0.1.0-py3-none-any.whl" in dbfs_loc
 
 
 def test_get_schedule_from_config(existing_job_config, config_value):

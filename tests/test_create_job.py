@@ -46,13 +46,13 @@ def test_create_job(new_job_config, requests_mock, mocker):
                                         'num_workers': 1},
                                     'libraries': [
                                         {
-                                            'whl': 'dbfs:/artifacts/job/job/dist/databricker-0.1.20-py3-none-any.whl'
+                                            'whl': 'dbfs:/artifacts/job/job/dist/app-0.1.0-py3-none-any.whl'
                                         },
                                         {'maven': {
-                                            'coordinates': 'com.azure.cosmos.spark:azure-cosmos-spark_3-2_2-12:4.12.1'}
+                                            'coordinates': 'java-artefact-1'}
                                         },
                                         {
-                                            'whl': 'dbfs:/artifacts/common/python/databricker-0.1.9-py3-none-any.whl'
+                                            'whl': 'python-wheel-1'
                                         }
                                     ]
                                     }
@@ -94,7 +94,7 @@ def test_serialises_additional_artefacts(existing_cluster_job_config, requests_m
     assert len(libs) == 5
 
     expected_artefacts = [
-        {'whl': 'dbfs:/artifacts/job/job/dist/databricker-0.1.20-py3-none-any.whl'},
+        {'whl': 'dbfs:/artifacts/job/job/dist/app-0.1.0-py3-none-any.whl'},
         {'maven': {'coordinates': 'java-artefact-1'}},
         {'maven': {'coordinates': 'java_artefact_2'}},
         {'whl': 'wheel-1'},

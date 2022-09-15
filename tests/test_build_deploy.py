@@ -27,12 +27,8 @@ def test_builds_and_deploys(existing_job_config, mocker, requests_mock):
 
     assert patch_cmd == ['poetry', 'version', 'patch']
     assert build_cmd == ['poetry', 'build']
-
-    _, _, _, fs, cp, artifact, folder = cp_cmd
-    assert fs == 'fs'
-    assert cp == 'cp'
-    assert "dist/databricker-" in artifact
-    assert folder == "dbfs:/artifacts/job/job/dist"
+    assert cp_cmd == ['poetry', 'run', 'databricks', 'fs', 'cp', 'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
+                      'dbfs:/artifacts/job/job/dist']
 
 
 def test_does_not_bump_version(existing_job_config, mocker, requests_mock):
@@ -53,11 +49,8 @@ def test_does_not_bump_version(existing_job_config, mocker, requests_mock):
     build_cmd, cp_cmd = cmds
 
     assert build_cmd == ['poetry', 'build']
-    _, _, _, fs, cp, artifact, folder = cp_cmd
-    assert fs == 'fs'
-    assert cp == 'cp'
-    assert "dist/databricker-" in artifact
-    assert folder == "dbfs:/artifacts/job/job/dist"
+    assert cp_cmd == ['poetry', 'run', 'databricks', 'fs', 'cp', 'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
+                      'dbfs:/artifacts/job/job/dist']
 
 
 def test_error_on_databricks_cp(existing_job_config, mocker, requests_mock):
@@ -73,6 +66,7 @@ def test_error_on_databricks_cp(existing_job_config, mocker, requests_mock):
 
     assert result.is_left()
     assert result.error() == "Failure executing command poetry run databricks fs cp ..."
+
 
 def test_deploys_a_library(library_config, mocker, requests_mock):
     CliCommandSpy().commands = []
@@ -91,7 +85,6 @@ def test_deploys_a_library(library_config, mocker, requests_mock):
 
     assert len(cmds) == 2
     assert not req_mock.request_history
-
 
 
 #

@@ -5,8 +5,9 @@ from . import singleton
 
 class InfraConfig(singleton.Singleton):
 
-    def configure(self, infra_config_file: str, dist: str = "dist"):
+    def configure(self, infra_config_file: str, pyproject: str, dist: str = "dist"):
         self.infra_config_file = infra_config_file
+        self.pyproject = pyproject
         self.dist = dist
         pass
 

@@ -8,8 +8,8 @@ import glob
 from . import value, monad, cli_helpers, fn
 
 
-def configure(infra_config_file, dist="dist"):
-    value.InfraConfig().configure(infra_config_file=infra_config_file, dist=dist)
+def configure(infra_config_file, pyproject="pyproject.toml" ,dist="dist"):
+    value.InfraConfig().configure(infra_config_file=infra_config_file, pyproject= pyproject, dist=dist)
     pass
 
 
@@ -29,7 +29,7 @@ def config_value():
 
 
 def read_project_toml():
-    return tomli.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+    return tomli.loads(Path().joinpath(value.InfraConfig().pyproject).read_text(encoding="utf-8"))
 
 
 def update_infra_job_id(cfg, job_id):
