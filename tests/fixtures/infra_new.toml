@@ -16,7 +16,7 @@ num_workers = 1
 node_type_id = "Standard_DS3_v2"
 
 [emailNotifications]
-on_failure = "cperks@nzsuperfund.co.nz"
+on_failure = "admin@example.com"
 
 [artefacts]
 root = "dbfs:/artifacts/job/job/dist"

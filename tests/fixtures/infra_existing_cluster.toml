@@ -15,7 +15,7 @@ type = "existingCluster"
 cluster_id = "0914-001041-jbnfazlx"
 
 [emailNotifications]
-on_failure = "cperks@nzsuperfund.co.nz"
+on_failure = "admin@example.com"
 
 [artefacts]
 root = "dbfs:/artifacts/job/job/dist"

@@ -28,7 +28,7 @@ def test_create_job(new_job_config, requests_mock, mocker):
 
     expected_create_request = {'name': 'job',
                                'email_notifications': {'no_alert_for_skipped_runs': False,
-                                                       'on_failure': ['cperks@nzsuperfund.co.nz']},
+                                                       'on_failure': ['admin@example.com']},
                                'timeout_seconds': 0,
                                'max_concurrent_runs': 1,
                                'tasks': [

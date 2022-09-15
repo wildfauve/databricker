@@ -4,7 +4,7 @@
 root = "dbfs:/artifacts/common/python"
 
 [emailNotifications]
-on_failure = "cperks@nzsuperfund.co.nz"
+on_failure = "admin@example.com"
 
 [cluster]
 url = "https://adb-575697367950122.2.azuredatabricks.net"
