@@ -12,14 +12,14 @@ def update_job(cfg):
                                                      schedule=config.schedule_config(cfg)))
 
 
-@monad.monadic_try(exception_test_fn=error.http_error_test_fn)
+@monad.monadic_try(exception_test_fn=error.http_error_test_fn, error_cls=error.CliError)
 def update_job_caller(cfg, req):
     hdrs = {"Authorization": "Bearer {}".format(databricks.get_databricks_token(cfg))}
     result = requests.post(url_for_job_update(cfg), json=req, headers=hdrs)
     return result
 
 
-@monad.monadic_try(exception_test_fn=error.http_error_test_fn)
+@monad.monadic_try(exception_test_fn=error.http_error_test_fn, error_cls=error.CliError)
 def create_job_caller(cfg, req):
     hdrs = {"Authorization": "Bearer {}".format(databricks.get_databricks_token(cfg))}
     result = requests.post(url_for_job_create(cfg), json=req, headers=hdrs)
@@ -54,7 +54,7 @@ def on_failure_notification(cfg):
     return fn.deep_get(cfg.infra, ['emailNotifications', 'on_failure'])
 
 
-@monad.monadic_try(exception_test_fn=error.http_error_test_fn)
+@monad.monadic_try(exception_test_fn=error.http_error_test_fn, error_cls=error.CliError)
 def get_job(cfg):
     hdrs = {"Authorization": "Bearer {}".format(cfg.databrickcfg.get('DEFAULT', 'token'))}
     result = requests.get(url_for_job_get(cfg), params={"job_id": job_id(cfg)}, headers=hdrs)

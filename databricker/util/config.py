@@ -6,7 +6,7 @@ import os
 import glob
 from enum import Enum
 
-from . import value, monad, cli_helpers, fn
+from . import value, monad, cli_helpers, fn, error
 
 class PipelineType(Enum):
     JOB = 'job'
@@ -60,7 +60,7 @@ def write_infra_toml(toml: dict):
         tomli_w.dump(toml, fp)
 
 
-@monad.monadic_try()
+@monad.monadic_try(error_cls=error.CliError)
 def read_databricks_config(path):
     dbcfg = configparser.ConfigParser()
     dbcfg.read(path)

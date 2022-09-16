@@ -33,7 +33,7 @@ def install_library(cfg):
     return install(cfg, install_request(cfg=cfg))
 
 
-@monad.monadic_try(exception_test_fn=error.http_error_test_fn)
+@monad.monadic_try(exception_test_fn=error.http_error_test_fn, error_cls=error.CliError)
 def install(cfg, req):
     hdrs = {"Authorization": "Bearer {}".format(databricks.get_databricks_token(cfg))}
     result = requests.post(url_for_install(cfg), json=req, headers=hdrs)

@@ -80,7 +80,7 @@ def test_error_on_update_job_api(existing_job_config, mocker, requests_mock):
     result = build_deploy_command.run(bump="patch", no_version="no_version")
 
     assert result.is_left()
-    assert result.error().status_code == 401
+    assert result.error().code == 401
 
 
 
@@ -148,4 +148,4 @@ def cli_spy_wrapper(returner_fn=success_returner):
 
 
 def html_unauthorised_response():
-    '<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>\n<title>Error 401 Unauthorized</title>\n</head>\n<body><h2>HTTP ERROR 401</h2>\n<p>Problem accessing /api/2.0//jobs/update. Reason:\n<pre>    Unauthorized</pre></p>\n</body>\n</html>\n'
+    return '<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>\n<title>Error 401 Unauthorized</title>\n</head>\n<body><h2>HTTP ERROR 401</h2>\n<p>Problem accessing /api/2.0//jobs/update. Reason:\n<pre>    Unauthorized</pre></p>\n</body>\n</html>\n'
