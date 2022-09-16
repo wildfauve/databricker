@@ -116,7 +116,7 @@ def update_job(cfg):
     if result.is_right():
         cli_helpers.echo("Update Job Artefact Success")
         return monad.Right(cfg)
-    cli_helpers.echo("Update Job Artefact Failure: {}".format(result.error().json()))
+    cli_helpers.echo(f"Update Job Artefact Failure: {result.error().status_code} : {result.error().text}")
     return result
 
 
