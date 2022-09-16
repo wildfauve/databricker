@@ -1,7 +1,7 @@
 from enum import Enum
 import requests
 
-from . import fn, error, config, monad
+from . import fn, error, config, monad, databricks
 
 
 class ClusterType(Enum):
@@ -35,7 +35,7 @@ def install_library(cfg):
 
 @monad.monadic_try(exception_test_fn=error.http_error_test_fn)
 def install(cfg, req):
-    hdrs = {"Authorization": "Bearer {}".format(cfg.databrickcfg.get('DEFAULT', 'token'))}
+    hdrs = {"Authorization": "Bearer {}".format(databricks.get_databricks_token(cfg))}
     result = requests.post(url_for_install(cfg), json=req, headers=hdrs)
     return result
 

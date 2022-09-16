@@ -2,7 +2,7 @@ import requests
 from enum import Enum
 from functools import reduce
 
-from . import monad, error, fn, config, artefacts, env
+from . import monad, error, fn, config, artefacts, env, databricks
 
 
 def update_job(cfg):
@@ -14,14 +14,14 @@ def update_job(cfg):
 
 @monad.monadic_try(exception_test_fn=error.http_error_test_fn)
 def update_job_caller(cfg, req):
-    hdrs = {"Authorization": "Bearer {}".format(get_databricks_token(cfg))}
+    hdrs = {"Authorization": "Bearer {}".format(databricks.get_databricks_token(cfg))}
     result = requests.post(url_for_job_update(cfg), json=req, headers=hdrs)
     return result
 
 
 @monad.monadic_try(exception_test_fn=error.http_error_test_fn)
 def create_job_caller(cfg, req):
-    hdrs = {"Authorization": "Bearer {}".format(get_databricks_token(cfg))}
+    hdrs = {"Authorization": "Bearer {}".format(databricks.get_databricks_token(cfg))}
     result = requests.post(url_for_job_create(cfg), json=req, headers=hdrs)
     return result
 
@@ -52,13 +52,6 @@ def email_notifications(cfg):
 
 def on_failure_notification(cfg):
     return fn.deep_get(cfg.infra, ['emailNotifications', 'on_failure'])
-
-
-def get_databricks_token(cfg):
-    token_from_env = env.Env().databricks_token()
-    if token_from_env:
-        return token_from_env
-    return cfg.databrickcfg.get('DEFAULT', 'token')
 
 
 @monad.monadic_try(exception_test_fn=error.http_error_test_fn)
