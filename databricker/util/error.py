@@ -23,6 +23,8 @@ class CliError(Exception):
     def __str__(self):
         return f"error: {self.message}, code: {self.code}"
 
+class ValidationError(CliError):
+    pass
 
 def http_error_test_fn(result) -> monad.EitherMonad:
     if result.is_left():
@@ -55,3 +57,20 @@ def content_type(resp):
     if not parts:
         return None
     return parts[0]
+
+
+def error_message(ex: monad.EitherMonad):
+    if not isinstance(ex, monad.MEither) or ex.is_right():
+        return None
+    if isinstance(ex.error(), CliError):
+        return ex.error().message
+    return str(ex.error())
+
+def error_ctx(ex: monad.EitherMonad):
+    if not isinstance(ex, monad.MEither) or ex.is_right():
+        return None
+    if isinstance(ex.error(), CliError):
+        return ex.error().ctx
+    return str(ex.error())
+
+

@@ -1,0 +1,21 @@
+[job]
+name = "job"
+task_key = "job"
+package_name = "cbor_builder"
+entry_point = "job_main"
+parameters = ["--all-batches"]
+schedule.cron = "0 0 * * * ?"
+schedule.pause_status = "UNPAUSED"
+schedule.tz = "UTC"
+
+[cluster]
+url = "https://example.databricks.com"
+type = "newCluster"
+
+[emailNotifications]
+on_failure = "admin@example.com"
+
+[artefacts]
+root = "dbfs:/artifacts/job/job/dist"
+maven_artefacts = ["java-artefact-1"]
+whl_artefacts = ["python-wheel-1"]

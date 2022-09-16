@@ -83,6 +83,13 @@ def test_error_on_update_job_api(existing_job_config, mocker, requests_mock):
     assert result.error().code == 401
 
 
+def test_error_in_config_of_no_job_or_cluster(error_new_job_on_new_cluster_job_config, config_value):
+    result = build_deploy_command.run(bump="patch", no_version="no_version")
+
+    assert result.error()
+    assert result.error().ctx == {'cluster': [{'cluster_id': ['required field']}], 'job': [{'id': ['required field']}]}
+
+
 
 def test_deploys_a_library(library_config, mocker):
     CliCommandSpy().commands = []

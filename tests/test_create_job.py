@@ -13,7 +13,7 @@ def test_create_job_fails_idempotent_check(existing_job_config):
     assert result.error() == "Job is already created with ID: 314471534377936. To fix delete the job first."
 
 
-def test_create_job(new_job_config, requests_mock, mocker):
+def test_create_job(new_job_on_new_cluster_job_config, requests_mock, mocker):
     req_mock = requests_mock.post("https://example.databricks.com/api/2.0/jobs/create",
                                   json=job_create_result(),
                                   status_code=200,
@@ -63,7 +63,7 @@ def test_create_job(new_job_config, requests_mock, mocker):
     assert req_mock.request_history[0].json() == expected_create_request
 
 
-def test_create_job_with_existing_cluster(existing_cluster_job_config, requests_mock, mocker):
+def test_create_job_with_existing_cluster(new_job_on_existing_cluster_job_config, requests_mock, mocker):
     requests_mock.post("https://example.databricks.com/api/2.0/jobs/create",
                        json=job_create_result(),
                        status_code=200,
@@ -80,7 +80,7 @@ def test_create_job_with_existing_cluster(existing_cluster_job_config, requests_
     assert create_job_req['tasks'][0]['existing_cluster_id'] == "0914-001041-jbnfazlx"
 
 
-def test_serialises_additional_artefacts(existing_cluster_job_config, requests_mock, mocker):
+def test_serialises_additional_artefacts(new_job_on_existing_cluster_job_config, requests_mock, mocker):
     requests_mock.post("https://example.databricks.com/api/2.0/jobs/create",
                        json=job_create_result(),
                        status_code=200,
@@ -104,7 +104,7 @@ def test_serialises_additional_artefacts(existing_cluster_job_config, requests_m
 
     assert libs == expected_artefacts
 
-def test_adds_tags_to_job(existing_cluster_job_config, requests_mock, mocker):
+def test_adds_tags_to_job(new_job_on_existing_cluster_job_config, requests_mock, mocker):
     requests_mock.post("https://example.databricks.com/api/2.0/jobs/create",
                        json=job_create_result(),
                        status_code=200,
@@ -112,7 +112,7 @@ def test_adds_tags_to_job(existing_cluster_job_config, requests_mock, mocker):
 
     mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
 
-    create_job_command.run()
+    res = create_job_command.run()
 
     tags = requests_mock.request_history[0].json()['tags']
 

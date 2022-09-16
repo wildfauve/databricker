@@ -1,0 +1,18 @@
+[job]
+id = "314471534377936"
+name = "job"
+task_key= "job"
+schedule.cron= "0 0 * * * ?"
+schedule.pause_status= "UNPAUSED"
+schedule.tz= "UTC"
+
+[cluster]
+url = "https://example.databricks.com"
+type = "existingCluster"
+cluster_id = "cluster-1"
+
+[emailNotifications]
+on_failure = "admin@example.com"
+
+[artefacts]
+root = "dbfs:/artifacts/job/job/dist"

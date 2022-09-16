@@ -6,10 +6,13 @@ import subprocess
 from . import monad
 
 
-def echo(message: Any):
+def echo(msg: Any, ctx: dict = None):
     formatted_time = pendulum.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-    formatted_message = f"[infra][{formatted_time}] {message}"
-    click.echo(formatted_message)
+    if ctx:
+        click.echo(f"[infra][{formatted_time}] {msg} {ctx}")
+        return None
+    click.echo(f"[infra][{formatted_time}] {msg}")
+
 
 
 def run_command(cmd: List, message: str = "") -> monad.EitherMonad:

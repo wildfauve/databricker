@@ -1,6 +1,7 @@
 import sys
 
-from databricker.util import config, job, cli_helpers, monad, cluster, env
+from databricker.util import config, job, cli_helpers, monad, cluster, env, error
+from databricker.validator import validator
 
 
 def run(bump, no_version=False):
@@ -51,23 +52,47 @@ def pipeline_fn(pipeline_type):
 
 def build_deploy_library(cfg):
     cli_helpers.echo("Building and Deploying Library")
-    return monad.Right(cfg) >> version >> build >> copy_to_dbfs
+    return monad.Right(cfg) >> lib_validator >> version >> build >> copy_to_dbfs
 
 
 def build_deploy_cluster_library(cfg):
     cli_helpers.echo("Building and Deploying Cluster Library")
-    return monad.Right(cfg) >> version >> build >> copy_to_dbfs >> install_on_cluster
+    return monad.Right(cfg) >> cluster_lib_validator >> version >> build >> copy_to_dbfs >> install_on_cluster
 
 
 def build_deploy_job(cfg):
     cli_helpers.echo("Building and Deploying Library")
-    return monad.Right(cfg) >> version >> build >> copy_to_dbfs >> update_job
+    return monad.Right(cfg) >> job_validator >> version >> build >> copy_to_dbfs >> update_job
 
 
 def noop_build_deploy(cfg):
     cli_helpers.echo(
         "The infra toml does not contain a recognised deployment type, must be a job, library or cluster-library")
     return monad.Right(None)
+
+
+def job_validator(cfg):
+    result = validator.existing_job_validator(cfg)
+    if result.is_right():
+        cli_helpers.echo("Infra File Validated OK")
+        return monad.Right(cfg)
+    return result
+
+
+def cluster_lib_validator(cfg):
+    result = validator.cluster_library_validator(cfg)
+    if result.is_right():
+        cli_helpers.echo("Infra File Validated OK")
+        return monad.Right(cfg)
+    return result
+
+
+def lib_validator(cfg):
+    result = validator.library_validator(cfg)
+    if result.is_right():
+        cli_helpers.echo("Infra File Validated OK")
+        return monad.Right(cfg)
+    return result
 
 
 def version(cfg):
@@ -116,7 +141,7 @@ def update_job(cfg):
     if result.is_right():
         cli_helpers.echo("Update Job Artefact Success")
         return monad.Right(cfg)
-    cli_helpers.echo(f"Update Job Artefact Failure: {str(result.error())}")
+    cli_helpers.echo(f"Update Job Artefact Failure: {error.error_message(result)}", ctx=error.error_ctx(result))
     return result
 
 
