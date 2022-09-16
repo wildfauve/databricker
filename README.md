@@ -1,4 +1,10 @@
-## Setting up You App for Databricker
+# Databricker
+
+Databricker is a set of CLI commands which enables deployment of Python applications to a Databricks cluster.  It supports 3 modes of deployment, a job, a library and a cluster library.
+
+Databricker only supports a few specific scenarios.  Its not designed as a general purpose Databricks CI/CD tool.  It uses the version 2.0 APIs, relies on the databricks-cli, and requires that the python app is built using poetry. 
+
+## Setting up You App to Support Databricker
 
 Ensure databricks-cli is installed in dev:
 
@@ -107,3 +113,32 @@ cluster_id = "spark_cluster_1"
 [artefacts]
 root = "dbfs:/artifacts/common/python"
 ```
+
+
+## Running Databricker Commands
+
+To get help:
+
+```shell
+poetry run infra
+```
+
+### Building and Deploying
+
+Depending on the type of app, build and deploy performs the following:
++ Runs `poetry version`.  This can be disabled with the `--no-version` option
++ Runs `poetry build`.
++ Copies the built artefact to DBFS using the `databricks-cli`
++ For a job, the job configuration is updated with the new artefact location.
++ For a cluster library, the arefact is installed on the cluster.
+
+```shell
+poetry run infra build-deploy
+```
+
+To disable running the `poetry version` command:
+
+```shell
+poetry run infra build-deploy --no-version
+```
+
