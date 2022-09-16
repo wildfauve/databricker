@@ -79,7 +79,9 @@ def test_error_on_update_job_api(existing_job_config, mocker, requests_mock):
 
     result = build_deploy_command.run(bump="patch", no_version="no_version")
 
-    # breakpoint()
+    assert result.is_left()
+    assert result.error().status_code == 401
+
 
 
 def test_deploys_a_library(library_config, mocker):
