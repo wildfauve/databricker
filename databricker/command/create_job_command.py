@@ -51,7 +51,7 @@ def create(cfg_req_tuple: Tuple[value.ConfigValue, Dict]) -> Tuple[value.ConfigV
     if result.is_right():
         cli_helpers.echo("Create Job Success, with new job id: {}".format(result.value.json()['job_id']))
         return monad.Right((cfg, req, result.value.json()))
-    cli_helpers.echo("Create Job Failure: {}".format(result.error().json()))
+    cli_helpers.echo(f"Create Job Failure: {str(result.error())}")
     return result
 
 
