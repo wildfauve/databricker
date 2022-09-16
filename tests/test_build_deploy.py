@@ -68,6 +68,20 @@ def test_error_on_databricks_cp(existing_job_config, mocker, requests_mock):
     assert result.error() == "Failure executing command poetry run databricks fs cp ..."
 
 
+def test_error_on_update_job_api(existing_job_config, mocker, requests_mock):
+    CliCommandSpy().commands = []
+    req_mock = requests_mock.post("https://example.databricks.com/api/2.0/jobs/update",
+                                  text=html_unauthorised_response(),
+                                  status_code=401,
+                                  headers={'Content-Type': 'text/html; charset=utf-8'})
+
+    mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
+
+    result = build_deploy_command.run(bump="patch", no_version="no_version")
+
+    # breakpoint()
+
+
 def test_deploys_a_library(library_config, mocker):
     CliCommandSpy().commands = []
     mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
@@ -129,3 +143,7 @@ def cli_spy_wrapper(returner_fn=success_returner):
         return returner_fn(cmd)
 
     return cli_spy
+
+
+def html_unauthorised_response():
+    '<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>\n<title>Error 401 Unauthorized</title>\n</head>\n<body><h2>HTTP ERROR 401</h2>\n<p>Problem accessing /api/2.0//jobs/update. Reason:\n<pre>    Unauthorized</pre></p>\n</body>\n</html>\n'
