@@ -7,6 +7,7 @@ from . import fn, error, config, monad, databricks
 class ClusterType(Enum):
     NEW = 'newCluster'
     EXISTING = 'existingCluster'
+    NOTAJOB = None
 
 
 def cluster_type(cfg):

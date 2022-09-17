@@ -19,6 +19,13 @@ def test_list_job(existing_job_config, requests_mock):
     assert result['job_id'] == 1
 
 
+def test_fails_when_not_a_job(cluster_library_config):
+    result = list_job_command.run()
+
+    assert result.is_left()
+    assert result.error().error() == {'error': 'Not a Job', 'code': 500, 'step': '', 'ctx': {}}
+
+
 def job_list_result():
     return {'job_id': 1, 'creator_user_name': 'admin@nzsuperfund.co.nz',
             'run_as_user_name': 'admim@nzsuperfund.co.nz', 'run_as_owner': True,

@@ -1,17 +1,30 @@
 import sys
 
-from databricker.util import config, job, cli_helpers, monad, error, env
+from databricker.util import config, job, cli_helpers, monad, error, env, cluster
+from databricker.validator import validator
+
 
 def run():
     """
     Lists the job with the job id defined in the infra.toml file.
     """
-    result = config.config_value() >> show_job
+    result = config.config_value() >> validate_job >> show_job
     if env.Env().env == "test":
         return result
     if not result:
         sys.exit(1)
     sys.exit(0)
+
+
+def validate_job(cfg):
+    if cluster.cluster_type(cfg) == cluster.ClusterType.NOTAJOB:
+        cli_helpers.echo("This app is not a job.  Cant list the job")
+        return monad.Left(error.CliError("Not a Job"))
+    result = validator.existing_job_validator(cfg)
+    if result.is_right():
+        cli_helpers.echo("Infra File Validated OK")
+        return monad.Right(cfg)
+    return result
 
 
 def show_job(cfg) -> monad.EitherMonad:
@@ -20,6 +33,5 @@ def show_job(cfg) -> monad.EitherMonad:
         job_config = result.value.json()
         cli_helpers.echo("SUCCESS: {}".format(job_config))
         return job_config
-    cli_helpers.echo("FAILURE: {}".format(result.error().json()))
-    return None
-
+    cli_helpers.echo(f"List Job Failure: {error.error_message(result)}", ctx=error.error_ctx(result))
+    return result
