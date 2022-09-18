@@ -1,4 +1,5 @@
 import sys
+import json
 
 from databricker.util import config, job, cli_helpers, monad, error, env, cluster
 from databricker.validator import validator
@@ -31,7 +32,7 @@ def show_job(cfg) -> monad.EitherMonad:
     result = job.get_job(cfg)
     if result.is_right():
         job_config = result.value.json()
-        cli_helpers.echo("SUCCESS: {}".format(job_config))
+        cli_helpers.echo("SUCCESS: {}".format(json.dumps(job_config, indent=4)))
         return job_config
     cli_helpers.echo(f"List Job Failure: {error.error_message(result)}", ctx=error.error_ctx(result))
     return result
