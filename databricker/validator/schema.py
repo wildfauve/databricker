@@ -41,7 +41,7 @@ existing_job = {
     'type': 'dict',
     'nullable': False,
     'empty': False,
-    'schema': {**{'id': required_non_empty_str}, **job_base}
+    'schema': {**{'id': required_non_empty_int}, **job_base}
 }
 
 new_job = {

@@ -1,5 +1,5 @@
 [job]
-id = "314471534377936"
+id = 314471534377936
 name = "job"
 task_key= "job"
 package_name = "cbor_builder"
