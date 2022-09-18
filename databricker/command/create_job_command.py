@@ -72,7 +72,7 @@ def update_infra_toml(cfg_req_job_tuple: Tuple[value.ConfigValue, Dict, Dict]):
     cli_helpers.echo("Updating infra tomli with job id")
     cfg, req, created_job = cfg_req_job_tuple
 
-    config.update_infra_job_id(cfg, created_job['job_id'])
+    config.update_infra_job_id(cfg, str(created_job['job_id']))
     return monad.Right(cfg_req_job_tuple)
 
 

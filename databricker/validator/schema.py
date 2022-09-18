@@ -1,5 +1,5 @@
 """
-{'job': {'id': '314471534377936', 'name': 'job', 'task_key': 'job',
+{'job': {'id': 314471534377936, 'name': 'job', 'task_key': 'job',
          'schedule': {'cron': '0 0 * * * ?', 'pause_status': 'UNPAUSED', 'tz': 'UTC'}},
  'cluster': {'url': 'https://example.databricks.com', 'type': 'newCluster', 'spark_version': '11.1.x-scala2.12',
              'num_workers': 1, 'node_type_id': 'Standard_DS3_v2'},
