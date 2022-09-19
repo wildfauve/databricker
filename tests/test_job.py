@@ -12,6 +12,7 @@ def test_builds_job_update_request_with_schedule(existing_job_config, config_val
     expected_request = {
         'job_id': '1',
         'new_settings': {
+            'parameters': [],
             'tasks': [
                 {'task_key': 'cbor_builder',
                  'libraries': [{'whl': 'dbfs:/artifacts/job/job/dist/app-0.1.0-py3-none-any.whl'}]

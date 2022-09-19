@@ -106,6 +106,7 @@ def update_job_request(cfg, job_id: str, task_key: str, schedule: str = None):
     base_job = {
         "job_id": job_id,
         "new_settings": {
+            "parameters": parameters(cfg),
             "tasks": [
                 {
                     "task_key": task_key,
