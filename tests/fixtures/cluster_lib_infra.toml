@@ -3,7 +3,7 @@ name = "a_lib"
 
 [cluster]
 url = "https://example.databricks.com"
-cluster_id = "spark_cluster_1"
+cluster_ids = ["spark_cluster_1", "spark_cluster_2"]
 
 [artefacts]
 root = "dbfs:/artifacts/common/python"

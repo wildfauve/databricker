@@ -16,6 +16,8 @@ optional_int = {'type': 'integer', 'nullable': True, 'required': False}
 
 optional_list_strs = {'type': 'list', 'schema': optional_str}
 
+required_list_strs = {'type': 'list', 'schema': required_non_empty_str}
+
 tags = {'type': 'dict',
         'required': False,
         'nullable': True,
@@ -80,6 +82,20 @@ existing_cluster = {
                             'node_type_id': optional_str}
                }
 }
+
+existing_cluster_with_multi_ids = {
+    'type': 'dict',
+    'nullable': False,
+    'empty': False,
+    'schema': {**cluster_base,
+               **{'cluster_ids': required_list_strs,
+                  'type': {'type': 'string', 'allowed': ['newCluster', 'existingCluster']},
+                           'spark_version': optional_str,
+                            'num_workers': optional_int,
+                            'node_type_id': optional_str}
+               }
+}
+
 
 existing_cluster_base = {
     'type': 'dict',
@@ -149,6 +165,6 @@ library_schema = {
 
 cluster_library_schema = {
     'cluster_library': library,
-    'cluster': existing_cluster,
+    'cluster': existing_cluster_with_multi_ids,
     'artefacts': artefacts
 }

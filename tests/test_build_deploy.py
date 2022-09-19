@@ -90,7 +90,6 @@ def test_error_in_config_of_no_job_or_cluster(error_new_job_on_new_cluster_job_c
     assert result.error().ctx == {'cluster': [{'cluster_id': ['required field']}], 'job': [{'id': ['required field']}]}
 
 
-
 def test_deploys_a_library(library_config, mocker):
     CliCommandSpy().commands = []
     mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
@@ -104,7 +103,7 @@ def test_deploys_a_library(library_config, mocker):
     assert len(cmds) == 2
 
 
-def test_deploys_a_cluster_library(cluster_library_config, mocker, requests_mock):
+def test_deploys_a_cluster_library_to_multiple_clusters(cluster_library_config, mocker, requests_mock):
     CliCommandSpy().commands = []
     req_mock = requests_mock.post("https://example.databricks.com/api/2.0/libraries/install",
                                   json={},
@@ -121,10 +120,32 @@ def test_deploys_a_cluster_library(cluster_library_config, mocker, requests_mock
                     ['poetry', 'run', 'databricks', 'fs', 'cp', 'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
                      'dbfs:/artifacts/common/python']]
 
-    expected_request = {'cluster_id': 'spark_cluster_1',
-                        'libraries': [{'whl': 'dbfs:/artifacts/common/python/app-0.1.0-py3-none-any.whl'}]}
+    expected_request_1 = {'cluster_id': 'spark_cluster_1',
+                          'libraries': [{'whl': 'dbfs:/artifacts/common/python/app-0.1.0-py3-none-any.whl'}]}
+    expected_request_2 = {'cluster_id': 'spark_cluster_2',
+                          'libraries': [{'whl': 'dbfs:/artifacts/common/python/app-0.1.0-py3-none-any.whl'}]}
 
-    assert req_mock.request_history[0].json() == expected_request
+    assert len(req_mock.request_history) == 2
+    assert req_mock.request_history[0].json() == expected_request_1
+    assert req_mock.request_history[1].json() == expected_request_2
+
+
+def test_builder_composite_error_when_partial_failure_on_deploy_cluster_lib(cluster_library_config, mocker,
+                                                                            requests_mock):
+    CliCommandSpy().commands = []
+    req_mock = requests_mock.post("https://example.databricks.com/api/2.0/libraries/install",
+                                  [
+                                      {'json': {}, 'status_code': 200},
+                                      {'text': html_unauthorised_response(),
+                                       'status_code': 401,
+                                       'headers': {'Content-Type': 'text/html; charset=utf-8'}}
+                                  ])
+
+    mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
+
+    result = build_deploy_command.run(bump="patch", no_version=True)
+
+    assert result.error().message == 'Http Error when calling https://example.databricks.com/api/2.0/libraries/install with statuscode: 401; '
 
 
 def test_noop_configuration(noop_config):
