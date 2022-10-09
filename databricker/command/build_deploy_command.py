@@ -1,6 +1,6 @@
 import sys
 
-from databricker.util import config, job, cli_helpers, monad, cluster, env, error
+from databricker.util import config, job, cli_helpers, artefacts, monad, cluster, env, error
 from databricker.validator import validator
 
 
@@ -52,17 +52,29 @@ def pipeline_fn(pipeline_type):
 
 def build_deploy_library(cfg):
     cli_helpers.echo("Building and Deploying Library")
-    return monad.Right(cfg) >> lib_validator >> version >> build >> copy_to_dbfs
+    return monad.Right(cfg) >> lib_validator >> test_artefact_folder_exists >> version >> build >> copy_to_dbfs
 
 
 def build_deploy_cluster_library(cfg):
     cli_helpers.echo("Building and Deploying Cluster Library")
-    return monad.Right(cfg) >> cluster_lib_validator >> version >> build >> copy_to_dbfs >> install_on_cluster
+    return (monad.Right(cfg)
+            >> cluster_lib_validator
+            >> test_artefact_folder_exists
+            >> version
+            >> build
+            >> copy_to_dbfs
+            >> install_on_cluster)
 
 
 def build_deploy_job(cfg):
     cli_helpers.echo("Building and Deploying Library")
-    return monad.Right(cfg) >> job_validator >> version >> build >> copy_to_dbfs >> update_job
+    return (monad.Right(cfg) >>
+            job_validator >>
+            test_artefact_folder_exists >>
+            version >>
+            build >>
+            copy_to_dbfs >>
+            update_job)
 
 
 def noop_build_deploy(cfg):
@@ -93,6 +105,13 @@ def lib_validator(cfg):
         cli_helpers.echo("Infra File Validated OK")
         return monad.Right(cfg)
     return result
+
+def test_artefact_folder_exists(cfg):
+    exists = artefacts.check_folder_exists(artefacts.artefacts_root(cfg))
+    if exists.is_left():
+        cli_helpers.echo(f"Cant find artefacts folder: {artefacts.artefacts_root(cfg)}")
+        return monad.Left(f"Artefact folder root doesnt exists, create before rerunning: {artefacts.artefacts_root(cfg)}")
+    return monad.Right(cfg)
 
 
 def version(cfg):

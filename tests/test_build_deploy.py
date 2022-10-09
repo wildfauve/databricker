@@ -19,8 +19,9 @@ def test_builds_and_deploys(existing_job_config, mocker, requests_mock):
 
     cmds = list(map(lambda cmd: cmd['cmd'], CliCommandSpy().commands))
 
-    patch_cmd, build_cmd, cp_cmd = cmds
+    ls_cmd, patch_cmd, build_cmd, cp_cmd = cmds
 
+    assert ls_cmd == ['databricks', 'fs', 'ls', 'dbfs:/artifacts/job/job/dist']
     assert patch_cmd == ['poetry', 'version', 'patch']
     assert build_cmd == ['poetry', 'build']
     assert cp_cmd == ['poetry', 'run', 'databricks', 'fs', 'cp', 'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
@@ -42,7 +43,7 @@ def test_does_not_bump_version(existing_job_config, mocker, requests_mock):
 
     cmds = list(map(lambda cmd: cmd['cmd'], CliCommandSpy().commands))
 
-    build_cmd, cp_cmd = cmds
+    ls_cmd, build_cmd, cp_cmd = cmds
 
     assert build_cmd == ['poetry', 'build']
     assert cp_cmd == ['poetry', 'run', 'databricks', 'fs', 'cp', 'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
@@ -96,7 +97,7 @@ def test_deploys_a_library(library_config, mocker):
 
     cmds = list(map(lambda cmd: cmd['cmd'], CliCommandSpy().commands))
 
-    assert len(cmds) == 2
+    assert len(cmds) == 3
 
 
 def test_deploys_a_cluster_library_to_multiple_clusters(cluster_library_config, mocker, requests_mock):
@@ -112,9 +113,11 @@ def test_deploys_a_cluster_library_to_multiple_clusters(cluster_library_config, 
 
     cmds = list(map(lambda cmd: cmd['cmd'], CliCommandSpy().commands))
 
-    assert cmds == [['poetry', 'build'],
-                    ['poetry', 'run', 'databricks', 'fs', 'cp', 'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
-                     'dbfs:/artifacts/common/python']]
+    assert cmds == [
+        ['databricks', 'fs', 'ls', 'dbfs:/artifacts/common/python'],
+        ['poetry', 'build'],
+        ['poetry', 'run', 'databricks', 'fs', 'cp', 'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
+         'dbfs:/artifacts/common/python']]
 
     expected_request_1 = {'cluster_id': 'spark_cluster_1',
                           'libraries': [{'whl': 'dbfs:/artifacts/common/python/app-0.1.0-py3-none-any.whl'}]}
@@ -153,22 +156,10 @@ def test_noop_configuration(noop_config):
 #
 # Helpers
 #
-def success_returner(cmd):
-    return monad.Right(None)
-
-
 def throw_error_on_cp(cmd):
     if 'fs' in cmd and 'cp' in cmd:
         return monad.Left('Failure executing command poetry run databricks fs cp ...')
     return monad.Right(None)
-
-
-def cli_spy_wrapper(returner_fn=success_returner):
-    def cli_spy(cmd: list, message: str = ""):
-        CliCommandSpy().commands.append({'cmd': cmd, 'message': message})
-        return returner_fn(cmd)
-
-    return cli_spy
 
 
 def html_unauthorised_response():

@@ -1,4 +1,4 @@
-from . import fn, cli_helpers, monad
+from . import fn, cli_helpers
 
 def check_folder_exists(folder_name):
     return cli_helpers.run_command(['databricks', 'fs', 'ls', folder_name], return_result=True)
