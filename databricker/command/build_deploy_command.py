@@ -139,9 +139,9 @@ def update_job(cfg):
     result = job.update_job(cfg)
 
     if result.is_right():
-        cli_helpers.echo("Update Job Artefact Success")
+        cli_helpers.echo("SUCCESS: Update Job Artefact")
         return monad.Right(cfg)
-    cli_helpers.echo(f"Update Job Artefact Failure: {error.error_message(result)}", ctx=error.error_ctx(result))
+    cli_helpers.echo(f"FAILURE: Update Job Artefact: {error.error_message(result)}", ctx=error.error_ctx(result))
     return result
 
 
@@ -153,9 +153,9 @@ def install_on_cluster(cfg):
     result = cluster.install_library(cfg)
 
     if result.is_right():
-        cli_helpers.echo("Library Installed on Cluster")
+        cli_helpers.echo("SUCCESS: Library Installed on Cluster")
         return monad.Right(cfg)
-    cli_helpers.echo(f"Library installation failed: {error.error_message(result)}", ctx=error.error_ctx(result))
+    cli_helpers.echo(f"FAILURE: Library installation: {error.error_message(result)}", ctx=error.error_ctx(result))
     return result
 
 

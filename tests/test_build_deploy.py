@@ -1,11 +1,7 @@
-from pymonad.tools import curry
-
-from databricker.util import monad, singleton, fn
+from databricker.util import monad, singleton
 from databricker.command import build_deploy_command
 
-
-class CliCommandSpy(singleton.Singleton):
-    commands = []
+from tests.shared import *
 
 
 def test_builds_and_deploys(existing_job_config, mocker, requests_mock):

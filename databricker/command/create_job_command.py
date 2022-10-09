@@ -2,7 +2,7 @@ from typing import Dict, Tuple
 from functools import reduce
 import sys
 
-from databricker.util import config, job, cli_helpers, monad, value, cluster, env, error
+from databricker.util import config, job, artefacts, cli_helpers, monad, value, cluster, env, error
 from databricker.validator import validator
 
 
@@ -15,7 +15,13 @@ def run():
         cli_helpers.echo("Unable to load the configurations.")
         return None
 
-    result = cfg >> idempotent_check >> create_validator >> build_job_request >> create >> update_infra_toml
+    result = (cfg
+              >> idempotent_check
+              >> create_validator
+              >> test_artefact_folder_exists
+              >> build_job_request
+              >> create
+              >> update_infra_toml)
 
     if result.is_right():
         cli_helpers.echo("Completed")
@@ -38,12 +44,18 @@ def create_validator(cfg):
         return monad.Right(cfg)
     return result
 
-
 def idempotent_check(cfg):
     job_id = job.job_id(cfg)
     if job_id:
         cli_helpers.echo("Job found in toml file with ID: {}".format(job_id))
         return monad.Left("Job is already created with ID: {}. To fix delete the job first.".format(job_id))
+    return monad.Right(cfg)
+
+def test_artefact_folder_exists(cfg):
+    exists = artefacts.check_folder_exists(artefacts.artefacts_root(cfg))
+    if exists.is_left():
+        cli_helpers.echo(f"Cant find artefacts folder: {artefacts.artefacts_root(cfg)}")
+        return monad.Left(f"Artefact folder root doesnt exists, create before rerunning: {artefacts.artefacts_root(cfg)}")
     return monad.Right(cfg)
 
 

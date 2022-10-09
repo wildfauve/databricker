@@ -1,5 +1,6 @@
-from databricker.command import list_job_command, build_deploy_command, create_job_command
-from databricker.util import config, job
+from databricker.command import create_job_command
+
+from tests.shared import *
 
 
 def setup_module():
@@ -18,7 +19,7 @@ def test_create_job(new_job_on_new_cluster_job_config, requests_mock, mocker):
                                   json=job_create_result(),
                                   status_code=200,
                                   headers={'Content-Type': 'application/json; charset=utf-8'})
-
+    mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
     mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
 
     result = create_job_command.run()
@@ -69,6 +70,7 @@ def test_create_job_with_existing_cluster(new_job_on_existing_cluster_job_config
                        status_code=200,
                        headers={'Content-Type': 'application/json; charset=utf-8'})
 
+    mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
     mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
 
     result = create_job_command.run()
@@ -86,6 +88,7 @@ def test_serialises_additional_artefacts(new_job_on_existing_cluster_job_config,
                        status_code=200,
                        headers={'Content-Type': 'application/json; charset=utf-8'})
 
+    mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
     mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
 
     create_job_command.run()
@@ -104,12 +107,14 @@ def test_serialises_additional_artefacts(new_job_on_existing_cluster_job_config,
 
     assert libs == expected_artefacts
 
+
 def test_adds_tags_to_job(new_job_on_existing_cluster_job_config, requests_mock, mocker):
     requests_mock.post("https://example.databricks.com/api/2.0/jobs/create",
                        json=job_create_result(),
                        status_code=200,
                        headers={'Content-Type': 'application/json; charset=utf-8'})
 
+    mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
     mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
 
     res = create_job_command.run()
@@ -119,6 +124,30 @@ def test_adds_tags_to_job(new_job_on_existing_cluster_job_config, requests_mock,
     assert tags == {'domain': 'portfolio', 'team': 'awesome', 'dataproduct': 'cbor'}
 
 
+def test_checks_artefact_root_exists(new_job_on_existing_cluster_job_config, requests_mock, mocker):
+    CliCommandSpy().commands = []
+    requests_mock.post("https://example.databricks.com/api/2.0/jobs/create",
+                       json=job_create_result(),
+                       status_code=200,
+                       headers={'Content-Type': 'application/json; charset=utf-8'})
+
+    mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
+    mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
+
+    create_job_command.run()
+
+    assert CliCommandSpy().commands[0]['cmd'] == ['databricks', 'fs', 'ls', 'dbfs:/artifacts/job/job/dist']
+
+
+def test_fails_when_folder_doesnt_exist(new_job_on_existing_cluster_job_config, mocker):
+    CliCommandSpy().commands = []
+    mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper(cli_failure_returner))
+    mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
+
+    result = create_job_command.run()
+
+    assert result.is_left()
+    assert result.error() == 'Artefact folder root doesnt exists, create before rerunning: dbfs:/artifacts/job/job/dist'
 
 
 #
