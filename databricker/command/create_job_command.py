@@ -2,11 +2,12 @@ from typing import Dict, Tuple
 from functools import reduce
 import sys
 
+from . import actions
 from databricker.util import config, job, artefacts, cli_helpers, monad, value, cluster, env, error
 from databricker.validator import validator
 
 
-def run():
+def run(bump, no_version=False):
     """
     Creates a new job if not already created
     """
@@ -15,10 +16,14 @@ def run():
         cli_helpers.echo("Unable to load the configurations.")
         return None
 
+    cfg.value.replace('args', {'bump': bump, 'no_version': no_version})
+
     result = (cfg
               >> idempotent_check
               >> create_validator
               >> test_artefact_folder_exists
+              >> version
+              >> build
               >> copy_to_dbfs
               >> build_job_request
               >> create
@@ -58,6 +63,14 @@ def test_artefact_folder_exists(cfg):
         cli_helpers.echo(f"Cant find artefacts folder: {artefacts.artefacts_root(cfg)}")
         return monad.Left(f"Artefact folder root doesnt exists, create before rerunning: {artefacts.artefacts_root(cfg)}")
     return monad.Right(cfg)
+
+def version(cfg):
+    return actions.version_artefact(cfg)
+
+def build(cfg):
+    return actions.build_artefact(cfg)
+
+
 
 def copy_to_dbfs(cfg):
     cli_helpers.echo("Copy {} to DBFS Location {}".format(config.dist_path(cfg), cfg.infra['artefacts']['root']))

@@ -8,7 +8,7 @@ def setup_module():
 
 
 def test_create_job_fails_idempotent_check(existing_job_config):
-    result = create_job_command.run()
+    result = create_job_command.run(bump="patch", no_version=False)
 
     assert result.is_left()
     assert result.error() == "Job is already created with ID: 314471534377936. To fix delete the job first."
@@ -22,7 +22,7 @@ def test_create_job(new_job_on_new_cluster_job_config, requests_mock, mocker):
     mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
     mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
 
-    result = create_job_command.run()
+    result = create_job_command.run(bump="patch", no_version=False)
 
     assert result.is_right()
     assert len(req_mock.request_history) == 1
@@ -73,7 +73,7 @@ def test_create_job_with_existing_cluster(new_job_on_existing_cluster_job_config
     mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
     mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
 
-    result = create_job_command.run()
+    result = create_job_command.run(bump="patch", no_version=False)
 
     assert result.is_right()
 
@@ -91,7 +91,7 @@ def test_serialises_additional_artefacts(new_job_on_existing_cluster_job_config,
     mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
     mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
 
-    create_job_command.run()
+    create_job_command.run(bump="patch", no_version=False)
 
     libs = requests_mock.request_history[0].json()['tasks'][0]['libraries']
 
@@ -117,7 +117,7 @@ def test_adds_tags_to_job(new_job_on_existing_cluster_job_config, requests_mock,
     mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
     mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
 
-    res = create_job_command.run()
+    res = create_job_command.run(bump="patch", no_version=False)
 
     tags = requests_mock.request_history[0].json()['tags']
 
@@ -134,10 +134,12 @@ def test_checks_artefact_root_exists(new_job_on_existing_cluster_job_config, req
     mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
     mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
 
-    create_job_command.run()
+    create_job_command.run(bump="patch", no_version=False)
 
     assert CliCommandSpy().commands[0]['cmd'] == ['databricks', 'fs', 'ls', 'dbfs:/artifacts/job/job/dist']
-    assert CliCommandSpy().commands[1]['cmd'] == ['poetry', 'run', 'databricks', 'fs', 'cp',
+    assert CliCommandSpy().commands[1]['cmd'] == ['poetry', 'version', 'patch']
+    assert CliCommandSpy().commands[2]['cmd'] == ['poetry', 'build']
+    assert CliCommandSpy().commands[3]['cmd'] == ['poetry', 'run', 'databricks', 'fs', 'cp',
                                                   'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
                                                   'dbfs:/artifacts/job/job/dist']
 
@@ -146,10 +148,11 @@ def test_checks_artefact_root_exists(new_job_on_existing_cluster_job_config, req
         mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper(cli_failure_returner))
         mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
 
-        result = create_job_command.run()
+        result = create_job_command.run(bump="patch", no_version=False)
 
         assert result.is_left()
         assert result.error() == 'Artefact folder root doesnt exists, create before rerunning: dbfs:/artifacts/job/job/dist'
+
 
 #
 # Helpers

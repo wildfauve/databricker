@@ -19,11 +19,15 @@ def list_job():
     pass
 
 @click.command()
-def create_job():
+@click.option("--bump", "-b", default="patch", type=click.Choice(['patch', 'minor', 'major'], case_sensitive=False),
+              help="States the version update type to be passed to the poetry version command.  Default is patch")
+@click.option("--no-version", "-n", 'no_version', flag_value="no_version", default=False,
+              help="Don't version the artefact.  This assumes that the version has already been updated")
+def create_job(bump, no_version):
     """
     Creates a Spark job from the configuration provided in the infra.toml
     """
-    create_job_command.run()
+    create_job_command.run(bump, no_version)
     pass
 
 

@@ -1,5 +1,6 @@
 import sys
 
+from . import actions
 from databricker.util import config, job, cli_helpers, artefacts, monad, cluster, env, error
 from databricker.validator import validator
 
@@ -107,48 +108,17 @@ def lib_validator(cfg):
     return result
 
 def test_artefact_folder_exists(cfg):
-    exists = artefacts.check_folder_exists(artefacts.artefacts_root(cfg))
-    if exists.is_left():
-        cli_helpers.echo(f"Cant find artefacts folder: {artefacts.artefacts_root(cfg)}")
-        return monad.Left(f"Artefact folder root doesnt exists, create before rerunning: {artefacts.artefacts_root(cfg)}")
-    return monad.Right(cfg)
-
+    return actions.check_artefact_folder_exists(cfg)
 
 def version(cfg):
-    if args_switch_check(cfg, 'no_version', False):
-        cli_helpers.echo("No Version update performed")
-        return monad.Right(cfg)
-    result = cli_helpers.run_command(["poetry", "version", cfg.args['bump']], message="Bump Version")
-    if result.is_right():
-        return monad.Right(cfg)
-    return result
-
+    return actions.version_artefact(cfg)
 
 def build(cfg):
-    current_version = cfg.project['tool']['poetry']['version']
-    result = cli_helpers.run_command(["poetry", "build"], message="Poetry build")
-    if result.is_right():
-        cfg.replace('project', config.read_project_toml())
-        new_version = cfg.project['tool']['poetry']['version']
-        cli_helpers.echo("Existing Version: {} New Version: {}".format(current_version, new_version))
-        return monad.Right(cfg)
-    return result
+    return actions.build_artefact(cfg)
 
 
 def copy_to_dbfs(cfg):
-    cli_helpers.echo("Copy {} to DBFS Location {}".format(config.dist_path(cfg), cfg.infra['artefacts']['root']))
-    result = cli_helpers.run_command(["poetry",
-                                      "run",
-                                      "databricks",
-                                      "fs",
-                                      "cp",
-                                      config.dist_path(cfg),
-                                      cfg.infra['artefacts']['root']],
-                                     message="Copy to DBFS")
-
-    if result.is_right():
-        return monad.Right(cfg)
-    return result
+    return actions.copy_artefact_to_dbfs(cfg)
 
 
 def update_job(cfg):
@@ -176,10 +146,3 @@ def install_on_cluster(cfg):
         return monad.Right(cfg)
     cli_helpers.echo(f"FAILURE: Library installation: {error.error_message(result)}", ctx=error.error_ctx(result))
     return result
-
-
-def args_switch_check(cfg, bool_arg_name, missing_is: bool = True):
-    bool_arg = cfg.args.get(bool_arg_name)
-    if bool_arg:
-        return True
-    return missing_is
