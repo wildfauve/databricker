@@ -19,6 +19,7 @@ def run():
               >> idempotent_check
               >> create_validator
               >> test_artefact_folder_exists
+              >> copy_to_dbfs
               >> build_job_request
               >> create
               >> update_infra_toml)
@@ -57,6 +58,21 @@ def test_artefact_folder_exists(cfg):
         cli_helpers.echo(f"Cant find artefacts folder: {artefacts.artefacts_root(cfg)}")
         return monad.Left(f"Artefact folder root doesnt exists, create before rerunning: {artefacts.artefacts_root(cfg)}")
     return monad.Right(cfg)
+
+def copy_to_dbfs(cfg):
+    cli_helpers.echo("Copy {} to DBFS Location {}".format(config.dist_path(cfg), cfg.infra['artefacts']['root']))
+    result = cli_helpers.run_command(["poetry",
+                                      "run",
+                                      "databricks",
+                                      "fs",
+                                      "cp",
+                                      config.dist_path(cfg),
+                                      cfg.infra['artefacts']['root']],
+                                     message="Copy to DBFS")
+
+    if result.is_right():
+        return monad.Right(cfg)
+    return result
 
 
 def build_job_request(cfg) -> Tuple[value.ConfigValue, Dict]:
