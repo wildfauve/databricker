@@ -1,6 +1,7 @@
 import sys
 import json
 
+from . import actions
 from databricker.util import config, job, cli_helpers, monad, error, env, cluster
 from databricker.validator import validator
 
@@ -9,7 +10,7 @@ def run():
     """
     Lists the job with the job id defined in the infra.toml file.
     """
-    result = config.config_value() >> validate_job >> show_job
+    result = config.config_value() >> actions.validate_token_config >> validate_job >> show_job
     if env.Env().env == "test":
         return result
     if not result:

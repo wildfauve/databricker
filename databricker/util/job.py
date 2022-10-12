@@ -14,10 +14,13 @@ def update_job(cfg):
 
 @monad.monadic_try(exception_test_fn=error.http_error_test_fn, error_cls=error.CliError)
 def update_job_caller(cfg, req):
-    hdrs = {"Authorization": "Bearer {}".format(databricks.get_databricks_token(cfg))}
+    hdrs = {"Authorization": "Bearer {}".format(get_databricks_token(cfg).value)}
     result = requests.post(url_for_job_update(cfg), json=req, headers=hdrs)
     return result
 
+@monad.monadic_try(error_cls=error.ValidationError)
+def get_databricks_token(cfg):
+    return databricks.get_databricks_token(cfg)
 
 @monad.monadic_try(exception_test_fn=error.http_error_test_fn, error_cls=error.CliError)
 def create_job_caller(cfg, req):

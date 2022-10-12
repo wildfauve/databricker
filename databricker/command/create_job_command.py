@@ -20,6 +20,7 @@ def run(bump, no_version=False):
 
     result = (cfg
               >> idempotent_check
+              >> actions.validate_token_config
               >> create_validator
               >> test_artefact_folder_exists
               >> version

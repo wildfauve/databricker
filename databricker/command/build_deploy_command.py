@@ -23,7 +23,7 @@ def run(bump, no_version=False):
 
     cfg.value.replace('args', {'bump': bump, 'no_version': no_version})
 
-    result = cfg >> build_pipeline
+    result = cfg >> actions.validate_token_config >> build_pipeline
 
     if result.is_right():
         cli_helpers.echo("Completed")
