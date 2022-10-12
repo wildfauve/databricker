@@ -4,6 +4,10 @@ version = "0.1.45"
 description = ""
 authors = ["Col Perks <wild.fauve@gmail.com>"]
 
+[tool.poetry.scripts]
+infra = "databricker.infra:cli"
+
+
 [tool.poetry.dependencies]
 python = "^3.9"
 pendulum = "^2.1.2"
