@@ -22,8 +22,8 @@ tags = {'type': 'dict',
         'required': False,
         'nullable': True,
         'empty': True,
-        'keysrules': {'type': 'string', 'regex': '[a-z]+'},
-        'valuesrules': {'type': 'string', 'regex': '[a-z]+'}}
+        'keysrules': {'type': 'string', 'regex': r'\S+'},
+        'valuesrules': {'type': 'string', 'regex': r'\S+'}}
 
 schedule = {'cron': required_non_empty_str,
             'pause_status': required_non_empty_str,
@@ -50,7 +50,7 @@ new_job = {
     'type': 'dict',
     'nullable': False,
     'empty': False,
-    'schema': job_base
+    'schema': job_base,
 }
 
 cluster_base = {

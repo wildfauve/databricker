@@ -3,7 +3,6 @@ from databricker.util import artefacts, monad, cli_helpers, config, job, error
 def validate_token_config(cfg):
     if not job.get_databricks_token(cfg).is_right():
         return monad.Left(error.ValidationError("Token is not configured, check databrickcfg or DATABRICKS_TOKEN"))
-
     return monad.Right(cfg)
 
 

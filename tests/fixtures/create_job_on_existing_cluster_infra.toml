@@ -8,7 +8,7 @@ schedule.cron= "0 0 * * * ?"
 schedule.pause_status= "UNPAUSED"
 schedule.tz= "UTC"
 tags.domain = "portfolio"
-tags.team = "awesome"
+tags.team = "awesome-team"
 tags.dataproduct = "cbor"
 
 [cluster]

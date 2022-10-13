@@ -121,7 +121,7 @@ def test_adds_tags_to_job(new_job_on_existing_cluster_job_config, requests_mock,
 
     tags = requests_mock.request_history[0].json()['tags']
 
-    assert tags == {'domain': 'portfolio', 'team': 'awesome', 'dataproduct': 'cbor'}
+    assert tags == {'domain': 'portfolio', 'team': 'awesome-team', 'dataproduct': 'cbor'}
 
 
 def test_checks_artefact_root_exists(new_job_on_existing_cluster_job_config, requests_mock, mocker):

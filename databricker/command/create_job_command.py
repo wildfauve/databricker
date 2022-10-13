@@ -41,6 +41,13 @@ def run(bump, no_version=False):
         return result
     sys.exit(1)
 
+def idempotent_check(cfg):
+    job_id = job.job_id(cfg)
+    if job_id:
+        cli_helpers.echo("Job found in toml file with ID: {}".format(job_id))
+        return monad.Left("Job is already created with ID: {}. To fix delete the job first.".format(job_id))
+    return monad.Right(cfg)
+
 def create_validator(cfg):
     if cluster.cluster_type(cfg) == cluster.ClusterType.NEW:
         result = validator.new_job_new_cluster_validator(cfg)
@@ -50,13 +57,6 @@ def create_validator(cfg):
         cli_helpers.echo("Infra File Validated OK")
         return monad.Right(cfg)
     return result
-
-def idempotent_check(cfg):
-    job_id = job.job_id(cfg)
-    if job_id:
-        cli_helpers.echo("Job found in toml file with ID: {}".format(job_id))
-        return monad.Left("Job is already created with ID: {}. To fix delete the job first.".format(job_id))
-    return monad.Right(cfg)
 
 def test_artefact_folder_exists(cfg):
     exists = artefacts.check_folder_exists(artefacts.artefacts_root(cfg))
