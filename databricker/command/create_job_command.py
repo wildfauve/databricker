@@ -138,7 +138,7 @@ def add_task(cfg, req):
     task = {
         "task_key": job.task(cfg),
         "python_wheel_task": {
-            "package_name": job.job_name(cfg),
+            "package_name": job.package_name(cfg),
             "entry_point": job.entry_point(cfg),
             "parameters": job.parameters(cfg)
         },

@@ -37,6 +37,10 @@ def job_id(cfg):
     return fn.deep_get(cfg.infra, ['job', 'id'])
 
 
+def package_name(cfg):
+    return fn.deep_get(cfg.infra, ['job', 'package_name'])
+
+
 def task(cfg):
     return fn.deep_get(cfg.infra, ['job', 'task_key'])
 

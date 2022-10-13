@@ -35,7 +35,7 @@ def test_create_job(new_job_on_new_cluster_job_config, requests_mock, mocker):
                                'tasks': [
                                    {'task_key': 'job',
                                     'python_wheel_task': {
-                                        'package_name': 'job',
+                                        'package_name': 'cbor_builder',
                                         'entry_point': 'job_main',
                                         'parameters': [
                                             '--all-batches']},
@@ -143,15 +143,15 @@ def test_checks_artefact_root_exists(new_job_on_existing_cluster_job_config, req
                                                   'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
                                                   'dbfs:/artifacts/job/job/dist']
 
-    def test_fails_when_folder_doesnt_exist(new_job_on_existing_cluster_job_config, mocker):
-        CliCommandSpy().commands = []
-        mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper(cli_failure_returner))
-        mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
+def test_fails_when_folder_doesnt_exist(new_job_on_existing_cluster_job_config, mocker):
+    CliCommandSpy().commands = []
+    mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper(cli_failure_returner))
+    mocker.patch('databricker.util.config.write_infra_toml', return_value=None)
 
-        result = create_job_command.run(bump="patch", no_version=False)
+    result = create_job_command.run(bump="patch", no_version=False)
 
-        assert result.is_left()
-        assert result.error() == 'Artefact folder root doesnt exists, create before rerunning: dbfs:/artifacts/job/job/dist'
+    assert result.is_left()
+    assert result.error() == 'Artefact folder root doesnt exists, create before rerunning: dbfs:/artifacts/job/job/dist'
 
 
 #

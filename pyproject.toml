@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "databricker"
-version = "0.1.46"
+version = "0.1.47"
 description = ""
 authors = ["Col Perks <wild.fauve@gmail.com>"]
 
