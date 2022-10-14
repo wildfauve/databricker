@@ -5,11 +5,17 @@ from . import singleton
 
 class InfraConfig(singleton.Singleton):
 
-    def configure(self, infra_config_file: str, pyproject: str, dist: str = "dist"):
+    def configure(self,
+                  infra_config_file: str = "_infra/infra.toml",
+                  pyproject: str = "pyproject.toml",
+                  dist: str = "dist"):
         self.infra_config_file = infra_config_file
         self.pyproject = pyproject
         self.dist = dist
         pass
+
+    def configured(self) -> bool:
+        return hasattr(self, 'infra_config_file')
 
 
 @dataclass

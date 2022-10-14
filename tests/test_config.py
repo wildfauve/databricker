@@ -1,5 +1,10 @@
 from databricker.util import config
 
+def test_default_config():
+    result = config.config_value()
+
+    assert result.value.infra['job']['name'] == 'Testing-default-config'
+
 
 def test_infra_config(existing_job_config):
     result = config.config_value()

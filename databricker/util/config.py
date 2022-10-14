@@ -36,6 +36,8 @@ def infra_config():
 
 
 def config_value():
+    if not infra_config().configured():
+        infra_config().configure()
     infra = tomli.loads(Path().joinpath(value.InfraConfig().infra_config_file).read_text(encoding="utf-8"))
     dbcfg = read_databricks_config(databricks_config_path(infra))
     if dbcfg.is_left():

@@ -5,13 +5,14 @@ import subprocess
 
 from . import monad
 
+CLI_NAME = 'databricker'
 
 def echo(msg: Any, ctx: dict = None):
     formatted_time = pendulum.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
     if ctx:
-        click.echo(f"[infra][{formatted_time}] {msg} {ctx}")
+        click.echo(f"[{CLI_NAME}][{formatted_time}] {msg} {ctx}")
         return None
-    click.echo(f"[infra][{formatted_time}] {msg}")
+    click.echo(f"[{CLI_NAME}][{formatted_time}] {msg}")
 
 def new_line_splitter(res):
     return res.decode('utf-8').split('\n')
