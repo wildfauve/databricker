@@ -5,7 +5,7 @@ from databricker.util import config, job, cli_helpers, artefacts, monad, cluster
 from databricker.validator import validator
 
 
-def run(bump, no_version=False):
+def run(bump, no_version=False, profile: str = "DEFAULT"):
     """
     Builds and deploys the project.
 
@@ -21,7 +21,7 @@ def run(bump, no_version=False):
     if cfg.is_left():
         return None
 
-    cfg.value.replace('args', {'bump': bump, 'no_version': no_version})
+    cfg.value.replace('args', {'bump': bump, 'no_version': no_version, 'profile': profile})
 
     result = cfg >> actions.validate_token_config >> build_pipeline
 

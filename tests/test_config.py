@@ -1,6 +1,10 @@
-from databricker.util import config
+import pytest
+
+from databricker.util import config, value
 
 def test_default_config():
+    value.InfraConfig().configure()
+
     result = config.config_value()
 
     assert result.value.infra['job']['name'] == 'Testing-default-config'
@@ -13,7 +17,7 @@ def test_infra_config(existing_job_config):
 
     cfg = result.value
 
-    assert set(cfg.infra.keys()) == set(['job', 'artefacts', 'cluster', 'emailNotifications'])
+    assert set(cfg.infra.keys()) == set(['job', 'artefacts', 'emailNotifications', 'cluster'])
 
 
 def test_generates_dbfs_location_for_wheel(existing_job_config, config_value):

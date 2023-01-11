@@ -23,11 +23,13 @@ def list_job():
               help="States the version update type to be passed to the poetry version command.  Default is patch")
 @click.option("--no-version", "-n", 'no_version', flag_value="no_version", default=False,
               help="Don't version the artefact.  This assumes that the version has already been updated")
-def create_job(bump, no_version):
+@click.option("--profile", "-p", default="DEFAULT",
+              help="References the .databrickscfg environment")
+def create_job(bump, no_version, profile):
     """
     Creates a Spark job from the configuration provided in the infra.toml
     """
-    create_job_command.run(bump, no_version)
+    create_job_command.run(bump, no_version, profile)
     pass
 
 
@@ -36,7 +38,9 @@ def create_job(bump, no_version):
               help="States the version update type to be passed to the poetry version command.  Default is patch")
 @click.option("--no-version", "-n", 'no_version', flag_value="no_version", default=False,
               help="Don't version the artefact.  This assumes that the version has already been updated")
-def build_deploy(bump, no_version):
+@click.option("--profile", "-p", default="DEFAULT",
+              help="References the .databrickscfg environment")
+def build_deploy(bump, no_version, profile):
     """
     Builds and deploys the project.
 
@@ -48,7 +52,7 @@ def build_deploy(bump, no_version):
     + Copies the wheel to the cluster at the location defined in the infra.toml file at artefacts.root
     + Updates the job with the new artefact.
     """
-    build_deploy_command.run(bump, no_version)
+    build_deploy_command.run(bump, no_version), profile
     pass
 
 def configurator():

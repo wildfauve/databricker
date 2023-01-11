@@ -7,7 +7,7 @@ from databricker.util import config, job, artefacts, cli_helpers, monad, value, 
 from databricker.validator import validator
 
 
-def run(bump, no_version=False):
+def run(bump, no_version=False, profile: str = "DEFAULT"):
     """
     Creates a new job if not already created
     """
@@ -16,7 +16,7 @@ def run(bump, no_version=False):
         cli_helpers.echo("Unable to load the configurations.")
         return None
 
-    cfg.value.replace('args', {'bump': bump, 'no_version': no_version})
+    cfg.value.replace('args', {'bump': bump, 'no_version': no_version, 'profile': profile})
 
     result = (cfg
               >> idempotent_check

@@ -25,7 +25,7 @@ def test_builds_and_deploys(existing_job_config, mocker, requests_mock):
     assert patch_cmd == ['poetry', 'version', 'patch']
     assert build_cmd == ['poetry', 'build']
     assert cp_cmd == ['poetry', 'run', 'databricks', 'fs', 'cp', 'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
-                      'dbfs:/artifacts/job/job/dist']
+                      'dbfs:/artifacts/job/job/dist', '--profile DEFAULT']
 
 
 def test_does_not_bump_version(existing_job_config, mocker, requests_mock):
@@ -47,7 +47,7 @@ def test_does_not_bump_version(existing_job_config, mocker, requests_mock):
 
     assert build_cmd == ['poetry', 'build']
     assert cp_cmd == ['poetry', 'run', 'databricks', 'fs', 'cp', 'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
-                      'dbfs:/artifacts/job/job/dist']
+                      'dbfs:/artifacts/job/job/dist', '--profile DEFAULT']
 
 
 def test_error_on_databricks_cp(existing_job_config, mocker, requests_mock):
@@ -117,7 +117,7 @@ def test_deploys_a_cluster_library_to_multiple_clusters(cluster_library_config, 
         ['databricks', 'fs', 'ls', 'dbfs:/artifacts/common/python'],
         ['poetry', 'build'],
         ['poetry', 'run', 'databricks', 'fs', 'cp', 'tests/fixtures/test_dist/app-0.1.0-py3-none-any.whl',
-         'dbfs:/artifacts/common/python']]
+         'dbfs:/artifacts/common/python', '--profile DEFAULT']]
 
     expected_request_1 = {'cluster_id': 'spark_cluster_1',
                           'libraries': [{'whl': 'dbfs:/artifacts/common/python/app-0.1.0-py3-none-any.whl'}]}

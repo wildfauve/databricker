@@ -20,7 +20,8 @@ def copy_to_dbfs(cfg):
                                     "fs",
                                     "cp",
                                     config.dist_path(cfg),
-                                    cfg.infra['artefacts']['root']],
+                                    cfg.infra['artefacts']['root'],
+                                    f"--profile {cfg.args['profile']}"],
                                    message="Copy to DBFS")
 
 
