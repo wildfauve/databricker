@@ -50,6 +50,29 @@ def test_does_not_bump_version(existing_job_config, mocker, requests_mock):
                       'dbfs:/artifacts/job/job/dist', '--profile DEFAULT']
 
 
+def test_skips_copy_to_dbfs(existing_job_config, mocker, requests_mock):
+    CliCommandSpy().commands = []
+
+    req_mock = requests_mock.post("https://example.databricks.com/api/2.0/jobs/update",
+                                  json={},
+                                  status_code=200,
+                                  headers={'Content-Type': 'application/json; charset=utf-8'})
+
+    mocker.patch('databricker.util.cli_helpers.run_command', cli_spy_wrapper())
+
+    result = build_deploy_command.run(bump="patch", no_version="no_version", skip_copy=True)
+
+    assert result.is_right()
+
+    cmds = list(map(lambda cmd: cmd['cmd'], CliCommandSpy().commands))
+
+    expected_commands = [['databricks', 'fs', 'ls', 'dbfs:/artifacts/job/job/dist'], ['poetry', 'build']]
+
+    assert cmds == expected_commands
+
+    assert len(req_mock.request_history) == 1
+
+
 def test_error_on_databricks_cp(existing_job_config, mocker, requests_mock):
     CliCommandSpy().commands = []
     req_mock = requests_mock.post("https://example.databricks.com/api/2.0/jobs/update",

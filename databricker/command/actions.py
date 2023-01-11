@@ -28,7 +28,11 @@ def version_artefact(cfg):
 
 
 def copy_artefact_to_dbfs(cfg):
-    cli_helpers.echo("Copy {} to DBFS Location {}".format(config.dist_path(cfg), cfg.infra['artefacts']['root']))
+    if cfg.args.get('skip_copy', None):
+        cli_helpers.echo(f"SKIP Copy {config.dist_path(cfg)} to DBFS Location {cfg.infra['artefacts']['root']}")
+        return monad.Right(cfg)
+
+    cli_helpers.echo(f"Copy {config.dist_path(cfg)} to DBFS Location {cfg.infra['artefacts']['root']}")
     result = artefacts.copy_to_dbfs(cfg)
 
     if result.is_right():

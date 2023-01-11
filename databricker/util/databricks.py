@@ -10,4 +10,4 @@ def get_databricks_token(cfg):
     token_from_env = env.Env().databricks_token()
     if token_from_env:
         return token_from_env
-    return cfg.databrickcfg.get('DEFAULT', 'token')
+    return cfg.databrickcfg.get(cfg.args['profile'], 'token')
