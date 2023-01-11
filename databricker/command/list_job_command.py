@@ -6,11 +6,18 @@ from databricker.util import config, job, cli_helpers, monad, error, env, cluste
 from databricker.validator import validator
 
 
-def run():
+def run(profile: str = "DEFAULT"):
     """
     Lists the job with the job id defined in the infra.toml file.
     """
-    result = config.config_value() >> actions.validate_token_config >> validate_job >> show_job
+    cfg = config.config_value()
+    if cfg.is_left():
+        cli_helpers.echo("Unable to load the configurations.")
+        return None
+
+    cfg.value.replace('args', {'profile': profile})
+
+    result = cfg >> actions.validate_token_config >> validate_job >> show_job
     if env.Env().env == "test":
         return result
     if not result:

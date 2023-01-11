@@ -11,11 +11,13 @@ def cli():
 
 
 @click.command()
-def list_job():
+@click.option("--profile", "-p", default="DEFAULT",
+              help="References the .databrickscfg environment")
+def list_job(profile):
     """
     Lists the job with the job id defined in the infra.toml file.
     """
-    list_job_command.run()
+    list_job_command.run(profile)
     pass
 
 @click.command()
